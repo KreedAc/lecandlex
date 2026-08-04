@@ -1,0 +1,51 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { prezzoEsposto } from '../lib/sito';
+
+interface Props {
+  prodotto: CollectionEntry<'prodotti'>;
+  /** Le prime immagini della griglia non vanno caricate in lazy. */
+  priorita?: boolean;
+}
+
+const { prodotto, priorita = false } = Astro.props;
+const d = prodotto.data;
+---
+
+<article class="group">
+  <a href={`/catalogo/${prodotto.id}/`} class="block">
+    <div class="relative overflow-hidden rounded-lg bg-sabbia">
+      <Image
+        src={d.copertina}
+        alt={d.altCopertina}
+        widths={[300, 500, 800]}
+        sizes="(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 90vw"
+        loading={priorita ? 'eager' : 'lazy'}
+        class="aspect-square w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+      />
+      {
+        d.stampoEsclusivo && (
+          <span class="absolute top-3 left-3 rounded-full bg-inchiostro/85 px-3 py-1 text-xs font-medium text-crema">
+            Stampo esclusivo
+          </span>
+        )
+      }
+      {
+        !d.disponibile && (
+          <span class="absolute right-3 bottom-3 rounded-full bg-crema/95 px-3 py-1 text-xs font-medium text-fumo">
+            In preparazione
+          </span>
+        )
+      }
+    </div>
+
+    <div class="mt-3">
+      <h3 class="text-lg leading-snug transition-colors group-hover:text-fiamma">{d.nome}</h3>
+      <p class="mt-1 text-xs text-fumo">
+        {[d.dimensioni, d.pesoGrammi ? `${d.pesoGrammi} g` : null].filter(Boolean).join(' · ')}
+      </p>
+      <p class="mt-1.5 text-sm font-medium">{prezzoEsposto(d)}</p>
+    </div>
+  </a>
+</article>

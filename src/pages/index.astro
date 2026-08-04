@@ -2,102 +2,123 @@
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import CandelaCard from '../components/CandelaCard.astro';
+import ProdottoCard from '../components/ProdottoCard.astro';
 import BottoneWhatsApp from '../components/BottoneWhatsApp.astro';
 import { sito } from '../lib/sito';
-import copertinaHero from '../assets/candele/bergamotto-cedro.jpg';
-import fotoAtelier from '../assets/candele/atelier.jpg';
+import copertina from '../assets/copertina.jpg';
+import ritratto from '../assets/alessia.jpg';
 
-const candele = await getCollection('candele');
-const inEvidenza = candele
-  .filter((c) => c.data.inEvidenza)
+const prodotti = await getCollection('prodotti');
+const inEvidenza = prodotti
+  .filter((p) => p.data.inEvidenza)
   .sort((a, b) => a.data.ordine - b.data.ordine)
-  .slice(0, 3);
+  .slice(0, 4);
 
-// Se nessuna candela e' segnata come "in evidenza" mostriamo comunque le prime
-// tre: la home non deve mai restare vuota per una dimenticanza nel CMS.
+// La home non deve restare vuota per una dimenticanza nel CMS.
 const vetrina = inEvidenza.length
   ? inEvidenza
-  : candele.sort((a, b) => a.data.ordine - b.data.ordine).slice(0, 3);
+  : prodotti.sort((a, b) => a.data.ordine - b.data.ordine).slice(0, 4);
 ---
 
 <Base titolo={sito.nome}>
-  <section class="contenitore grid items-center gap-10 py-14 lg:grid-cols-2 lg:gap-16 lg:py-24">
+  <section class="contenitore grid items-center gap-10 py-12 lg:grid-cols-2 lg:gap-16 lg:py-20">
     <div>
       <p class="occhiello">{sito.sottotitolo}</p>
-      <!-- Nessuna interruzione forzata: a 390px i <br /> spezzavano male.
-           Il testo si bilancia da solo entro la larghezza massima. -->
-      <h1 class="mt-5 max-w-lg text-4xl leading-[1.08] text-balance sm:text-5xl lg:text-6xl xl:text-7xl">
-        Una candela non dovrebbe profumare di finto.
+      <h1 class="mt-5 max-w-lg text-4xl leading-[1.08] text-balance sm:text-5xl lg:text-6xl">
+        {sito.claim}
       </h1>
       <p class="mt-6 max-w-md text-lg leading-relaxed text-fumo">
-        {sito.claim} Le colo io, una alla volta, e ogni lotto esce leggermente diverso dal precedente.
+        Candele scultura e complementi d'arredo, fatti a mano uno per uno. Materiali 100% naturali e
+        non testati sugli animali.
       </p>
-      <div class="mt-9 flex flex-wrap gap-3">
+      <div class="mt-8 flex flex-wrap gap-3">
         <a
-          href="/candele/"
+          href="/catalogo/"
           class="inline-flex items-center rounded-full bg-inchiostro px-7 py-3 text-sm font-medium text-crema transition-colors hover:bg-fiamma"
         >
-          Guarda le candele
+          Sfoglia il catalogo
         </a>
         <BottoneWhatsApp
           variante="contorno"
-          messaggio="Ciao! Vorrei qualche informazione sulle candele."
+          messaggio="Ciao Alessia! Vorrei qualche informazione."
           testo="Scrivimi"
         />
       </div>
     </div>
 
-    <div class="relative">
-      <Image
-        src={copertinaHero}
-        alt="Candela artigianale accesa accanto a una finestra"
-        widths={[500, 800, 1100]}
-        sizes="(min-width: 1024px) 34rem, 92vw"
-        loading="eager"
-        fetchpriority="high"
-        class="aspect-4/5 w-full rounded-lg object-cover"
-      />
-    </div>
+    <Image
+      src={copertina}
+      alt="Il marchio Le CandLex: un loto con una fiamma, su tessuto chiaro"
+      widths={[500, 800, 1200]}
+      sizes="(min-width: 1024px) 34rem, 92vw"
+      loading="eager"
+      fetchpriority="high"
+      class="w-full rounded-lg object-cover"
+    />
   </section>
 
-  <section class="contenitore py-14">
+  <section class="contenitore py-12">
     <div class="flex flex-wrap items-end justify-between gap-4 border-b border-lino pb-5">
-      <h2 class="text-3xl sm:text-4xl">Le più richieste</h2>
-      <a href="/candele/" class="text-sm text-fumo underline underline-offset-4 transition-colors hover:text-fiamma">
-        Tutte le candele
+      <h2 class="text-3xl sm:text-4xl">Dal catalogo</h2>
+      <a
+        href="/catalogo/"
+        class="text-sm text-fumo underline underline-offset-4 transition-colors hover:text-fiamma"
+      >
+        Tutte le collezioni
       </a>
     </div>
 
-    <div class="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-      {vetrina.map((candela, i) => <CandelaCard candela={candela} priorita={i === 0} />)}
+    <div class="mt-8 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
+      {vetrina.map((prodotto, i) => <ProdottoCard prodotto={prodotto} priorita={i < 4} />)}
     </div>
   </section>
 
-  <section class="contenitore grid items-center gap-10 py-14 lg:grid-cols-2 lg:gap-16">
+  <section class="contenitore py-12">
+    <div class="grid gap-8 sm:grid-cols-3">
+      <a href="/catalogo/" class="group rounded-lg bg-sabbia p-7 transition-colors hover:bg-lino">
+        <h3 class="text-xl transition-colors group-hover:text-fiamma">Candele scultura</h3>
+        <p class="mt-2 text-sm leading-relaxed text-fumo">
+          Figure, fiori, animali e forme geometriche in cera. Molte nascono da stampi disegnati e
+          realizzati qui, che non trovi altrove.
+        </p>
+      </a>
+      <a href="/catalogo/" class="group rounded-lg bg-sabbia p-7 transition-colors hover:bg-lino">
+        <h3 class="text-xl transition-colors group-hover:text-fiamma">Arredo in ceramica</h3>
+        <p class="mt-2 text-sm leading-relaxed text-fumo">
+          Vassoi, svuotatasche, portagioie e vasi in Jesmonite. Personalizzabili nei colori e nelle
+          composizioni.
+        </p>
+      </a>
+      <a href="/eventi/" class="group rounded-lg bg-sabbia p-7 transition-colors hover:bg-lino">
+        <h3 class="text-xl transition-colors group-hover:text-fiamma">Bomboniere ed eventi</h3>
+        <p class="mt-2 text-sm leading-relaxed text-fumo">
+          Consulenza gratuita e attenzione al dettaglio. Qualunque articolo a catalogo può diventare
+          una bomboniera.
+        </p>
+      </a>
+    </div>
+  </section>
+
+  <section class="contenitore grid items-center gap-10 py-12 lg:grid-cols-[2fr_3fr] lg:gap-16">
     <Image
-      src={fotoAtelier}
-      alt="Il piano di lavoro dove vengono colate le candele"
-      widths={[500, 800, 1100]}
-      sizes="(min-width: 1024px) 34rem, 92vw"
-      class="aspect-3/2 w-full rounded-lg object-cover"
+      src={ritratto}
+      alt={`${sito.titolare}, che crea le candele Le CandLex`}
+      widths={[400, 600, 900]}
+      sizes="(min-width: 1024px) 24rem, 92vw"
+      class="w-full rounded-lg object-cover"
     />
     <div>
-      <p class="occhiello">Come nascono</p>
-      <h2 class="mt-4 text-3xl sm:text-4xl">Piccoli lotti, in cucina</h2>
-      <p class="mt-5 leading-relaxed text-fumo">
-        Niente stampi industriali e niente produzione in serie. Ogni lotto è di poche decine di pezzi,
-        colato a mano e lasciato riposare 48 ore prima di essere accesa la prima volta per il controllo.
-      </p>
-      <p class="mt-4 leading-relaxed text-fumo">
-        Uso cera di soia al 100%, senza paraffina, e stoppini in cotone non sbiancato. Se una candela
-        non brucia in modo pulito durante il controllo, quel pezzo non viene venduto.
+      <p class="occhiello">Chi sono</p>
+      <h2 class="mt-4 text-3xl sm:text-4xl">Dietro Le CandLex ci sono io</h2>
+      <p class="mt-5 text-lg leading-relaxed text-fumo">
+        «Mi chiamo Alessia, amo gli animali e la natura. Mi piace avere sempre nuove idee,
+        sperimentare e creare cose nuove. Le CandLex nasce proprio da qui.»
       </p>
       <a
         href="/storia/"
-        class="mt-7 inline-block text-sm underline underline-offset-4 transition-colors hover:text-fiamma"
+        class="mt-6 inline-block text-sm underline underline-offset-4 transition-colors hover:text-fiamma"
       >
-        Leggi la storia completa
+        Leggi tutto
       </a>
     </div>
   </section>

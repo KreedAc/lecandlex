@@ -1,8 +1,8 @@
-# LeCandleX
+# Le CandLex
 
-Vetrina per candele artigianali. Sito statico: catalogo con schede prodotto,
-contatto diretto via WhatsApp, contenuti modificabili da browser senza toccare
-il codice.
+Vetrina per **Le CandLex** di Alessia Vanni — candele scultura, arredo in
+ceramica e bomboniere. Sito statico: catalogo diviso per collezioni, contatto
+diretto via WhatsApp, contenuti modificabili da browser senza toccare il codice.
 
 Niente carrello: gli ordini passano da WhatsApp.
 
@@ -27,35 +27,46 @@ npm run check    # controllo dei tipi
 | Cosa | Dove |
 |---|---|
 | Colori e font | `src/styles/global.css`, blocco `@theme` |
-| Numero WhatsApp, Instagram, spedizioni | `src/data/sito.json` |
-| Le candele | `src/content/candele/*.md` |
+| Contatti, claim, preavvisi | `src/data/sito.json` |
+| Elenco fragranze | `src/data/fragranze.json` |
+| I prodotti | `src/content/prodotti/*.md` |
 | Le collezioni | `src/content/collezioni/*.md` |
-| Foto dei prodotti | `src/assets/candele/` |
-| Testo della pagina "La storia" | `src/pages/storia.astro` |
-| Regole di cura e FAQ | `src/pages/cura.astro`, `src/pages/contatti.astro` |
+| Foto dei prodotti | `src/assets/prodotti/` |
+| Testo "Chi sono" | `src/pages/storia.astro` |
+| Avvertenze e refill | `src/pages/cura.astro` |
+| Bomboniere e bouquet | `src/pages/eventi.astro` |
+| FAQ | `src/pages/contatti.astro` |
 
 ### La palette
 
-Tutti i colori del sito vengono da otto variabili in `src/styles/global.css`.
-Nessun altro file contiene un colore scritto a mano: per cambiare l'identità
-visiva si modificano quelle e basta.
+Tutti i colori vengono da otto variabili in `src/styles/global.css`. Tre sono
+ripresi dal catalogo Canva originale (`#af4c0f`, `#33241b`, `#d8d1cb`); gli altri
+sono derivati o scuriti per rispettare il contrasto WCAG AA. Il rapporto
+verificato è annotato accanto a ciascuna variabile.
 
-I valori attuali sono un segnaposto caldo e neutro. Tutte le combinazioni
-testo/sfondo rispettano il contrasto WCAG AA.
+### Il modello di un prodotto
+
+Il catalogo non è fatto di candele profumate in barattolo, quindi lo schema
+segue quello che identifica davvero un pezzo:
+
+- **materiale** — cera, ceramica, Jesmonite, resina, vetro, misto
+- **peso in grammi** e **dimensioni** (sempre base × altezza, come nel catalogo)
+- **varianti** — per gli articoli che esistono in più taglie con prezzi diversi
+- **stampo esclusivo** — badge per i pezzi il cui stampo è creato da Le CandLex
+- **personalizzabile** — colori e composizione su richiesta
+
+Le fragranze non stanno sul singolo prodotto: sono un elenco unico da cui il
+cliente sceglie, in `src/data/fragranze.json`.
 
 ### Le foto
 
-Vanno in `src/assets/candele/` e **non** in `public/`: solo da lì Astro le
+Vanno in `src/assets/prodotti/` e **non** in `public/`: solo da lì Astro le
 converte in WebP/AVIF responsive. Una foto da 4 MB caricata dal telefono viene
 servita a circa 20 kB.
 
-Formato consigliato: verticale 4:5, lato lungo almeno 1200 px.
-
-## Contenuto di esempio
-
-Le quattro candele, i testi e le foto attualmente nel repo sono **segnaposto**.
-Servono a far vedere la struttura e a mostrare come vanno scritte le schede
-reali. Le immagini sono gradienti generati, non fotografie.
+Le foto attualmente nel repo sono **ritagli dalle pagine del catalogo Canva**.
+Sono utilizzabili ma non ottimali: la risoluzione è quella dell'export, non
+dell'originale. Vanno sostituite con le foto sorgente appena disponibili.
 
 ## Deploy su Cloudflare Pages
 
@@ -93,18 +104,27 @@ gestisca il login GitHub — è gratuito e si configura una volta sola.
 3. **Collega** — in `public/admin/config.yml` sostituisci `base_url` con
    l'indirizzo del Worker, e verifica che `repo` e `branch` siano corretti.
 
-4. **Accesso** — l'account GitHub di chi gestisce il sito va aggiunto come
-   collaboratore del repository. Da quel momento può modificare tutto da
-   `/admin`, anche dal telefono: ogni salvataggio è un commit, e il sito si
-   ricostruisce da solo in un paio di minuti.
+4. **Accesso** — l'account GitHub di Alessia va aggiunto come collaboratore del
+   repository. Da quel momento può modificare tutto da `/admin`, anche dal
+   telefono: ogni salvataggio è un commit, e il sito si ricostruisce da solo.
 
 ## Da sistemare prima di andare online
 
-- [ ] Sostituire la palette in `src/styles/global.css` con i colori reali
-- [ ] Sostituire le foto segnaposto in `src/assets/candele/`
-- [ ] Compilare `src/data/sito.json` con numero WhatsApp, Instagram ed email veri
-- [ ] Riscrivere `src/pages/storia.astro` con le parole della titolare
-- [ ] Verificare prezzi, pesi e durate di ogni candela
+- [ ] **Verificare l'handle Instagram** in `src/data/sito.json`: nel catalogo
+      poteva essere `le_candlex_lab` o `le__candlex_lab` (uno o due underscore)
+- [ ] **Compilare i dati di spedizione**, ora segnati `DA CONFERMARE`: costo,
+      soglia di gratuità e tempi non erano nel catalogo
+- [ ] Trascrivere i prodotti delle collezioni ancora vuote (vedi sotto)
+- [ ] Sostituire le foto ritagliate con gli originali
 - [ ] Aggiungere privacy policy e cookie policy se si attivano statistiche
-- [ ] Controllare che le etichette dei barattoli riportino gli allergeni
-      richiesti dal regolamento CLP (CE 1272/2008) per le candele profumate
+- [ ] Controllare che le etichette riportino gli allergeni richiesti dal
+      regolamento CLP (CE 1272/2008) per i prodotti profumati
+
+## Stato del catalogo
+
+Le collezioni sono tutte create. I prodotti sono stati trascritti dal catalogo
+Canva a 77 pagine solo per **Collezione Preziosa**; le altre sono elencate sul
+sito come «in arrivo online» finché non vengono popolate.
+
+Le pagine del catalogo di partenza sono numerate: il campo `paginaCatalogo` in
+ogni prodotto indica da quale pagina provengono i dati, per poterli verificare.

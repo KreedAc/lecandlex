@@ -1,0 +1,198 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import BottoneWhatsApp from '../../components/BottoneWhatsApp.astro';
+import ProdottoCard from '../../components/ProdottoCard.astro';
+import {
+  sito,
+  prezzo,
+  prezzoEsposto,
+  messaggioProdotto,
+  etichettaMateriale,
+} from '../../lib/sito';
+
+export async function getStaticPaths() {
+  const prodotti = await getCollection('prodotti');
+  return prodotti.map((prodotto) => ({
+    params: { id: prodotto.id },
+    props: { prodotto },
+  }));
+}
+
+// Il tipo di `prodotto` viene inferito dalle props di getStaticPaths.
+const { prodotto } = Astro.props;
+const d = prodotto.data;
+const { Content } = await render(prodotto);
+
+const collezione = (await getCollection('collezioni')).find((c) => c.id === d.collezione.id);
+
+const altri = (await getCollection('prodotti'))
+  .filter((p) => p.id !== prodotto.id && p.data.collezione.id === d.collezione.id)
+  .sort((a, b) => a.data.ordine - b.data.ordine)
+  .slice(0, 4);
+
+const scheda = [
+  ['Materiale', etichettaMateriale[d.materiale]],
+  d.dimensioni ? ['Dimensioni', `${d.dimensioni} (base × altezza)`] : null,
+  d.pesoGrammi ? ['Peso', `${d.pesoGrammi} g`] : null,
+  d.profumabile ? ['Fragranza', 'A scelta tra quelle disponibili'] : null,
+  d.personalizzabile ? ['Personalizzazione', 'Colori e composizione su richiesta'] : null,
+].filter((r): r is [string, string] => r !== null);
+
+const datiStrutturati = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: d.nome,
+  description: d.estratto ?? `${d.nome} — ${collezione?.data.nome ?? 'Le CandLex'}`,
+  image: new URL(d.copertina.src, Astro.site).href,
+  brand: { '@type': 'Brand', name: sito.nome },
+  offers: {
+    '@type': 'Offer',
+    price: d.prezzo ?? Math.min(...d.varianti.map((v) => v.prezzo)),
+    priceCurrency: 'EUR',
+    availability: d.disponibile ? 'https://schema.org/InStock' : 'https://schema.org/BackOrder',
+    url: new URL(Astro.url.pathname, Astro.site).href,
+  },
+};
+---
+
+<Base titolo={d.nome} descrizione={d.estratto} immagine={d.copertina.src}>
+  <div class="contenitore py-8">
+    <nav aria-label="Percorso" class="text-sm text-fumo">
+      <a href="/catalogo/" class="underline underline-offset-4 transition-colors hover:text-fiamma">
+        Catalogo
+      </a>
+      <span class="mx-2" aria-hidden="true">/</span>
+      <span>{d.nome}</span>
+    </nav>
+  </div>
+
+  <article class="contenitore grid gap-10 pb-14 lg:grid-cols-2 lg:gap-16">
+    <div class="space-y-4">
+      <Image
+        src={d.copertina}
+        alt={d.altCopertina}
+        widths={[500, 800, 1200]}
+        sizes="(min-width: 1024px) 34rem, 92vw"
+        loading="eager"
+        fetchpriority="high"
+        class="w-full rounded-lg bg-sabbia object-cover"
+      />
+      {
+        d.galleria.map((foto) => (
+          <Image
+            src={foto.file}
+            alt={foto.alt}
+            widths={[500, 800, 1200]}
+            sizes="(min-width: 1024px) 34rem, 92vw"
+            loading="lazy"
+            class="w-full rounded-lg bg-sabbia object-cover"
+          />
+        ))
+      }
+    </div>
+
+    <div class="lg:sticky lg:top-24 lg:self-start">
+      {collezione && <p class="occhiello">{collezione.data.nome}</p>}
+      <h1 class="mt-3 text-4xl sm:text-5xl">{d.nome}</h1>
+      <p class="mt-4 text-2xl">{prezzoEsposto(d)}</p>
+
+      {
+        d.stampoEsclusivo && (
+          <p class="mt-4 inline-block rounded-full bg-inchiostro px-4 py-1.5 text-xs font-medium text-crema">
+            Stampo esclusivo, creato da Le CandLex
+          </p>
+        )
+      }
+
+      <p
+        class:list={[
+          'mt-4 flex items-center gap-2 text-sm',
+          d.disponibile ? 'text-salvia' : 'text-fumo',
+        ]}
+      >
+        <span
+          class:list={['inline-block h-2 w-2 rounded-full', d.disponibile ? 'bg-salvia' : 'bg-lino']}
+          aria-hidden="true"></span>
+        {d.disponibile ? 'Disponibile' : 'Non disponibile al momento'}
+      </p>
+
+      {d.nota && <p class="mt-3 text-sm text-fumo">{d.nota}</p>}
+
+      {
+        d.varianti.length > 0 && (
+          <div class="mt-8 border-t border-lino pt-7">
+            <h2 class="occhiello">Formati</h2>
+            <ul class="mt-4 divide-y divide-lino">
+              {d.varianti.map((v) => (
+                <li class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3 text-sm">
+                  <span>{v.nome}</span>
+                  <span class="text-xs text-fumo">
+                    {[v.dimensioni, v.pesoGrammi ? `${v.pesoGrammi} g` : null]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </span>
+                  <span class="font-medium">{prezzo(v.prezzo)}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+
+      <div class="mt-8">
+        <BottoneWhatsApp
+          messaggio={messaggioProdotto(d.nome, d.disponibile)}
+          testo={d.disponibile ? 'Ordina su WhatsApp' : 'Chiedi disponibilità'}
+        />
+        <p class="mt-3 text-xs text-fumo">Ti risponde Alessia, di persona.</p>
+      </div>
+
+      <div class="mt-9 border-t border-lino pt-8">
+        <h2 class="occhiello">Scheda</h2>
+        <dl class="mt-5 space-y-4">
+          {
+            scheda.map(([etichetta, valore]) => (
+              <div class="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+                <dt class="w-36 shrink-0 text-fumo">{etichetta}</dt>
+                <dd>{valore}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+
+      <div class="mt-8 space-y-4 border-t border-lino pt-8 leading-relaxed text-fumo">
+        <Content />
+      </div>
+
+      {
+        d.materiale === 'cera' && (
+          <p class="mt-8 rounded-lg bg-sabbia p-5 text-sm leading-relaxed text-fumo">
+            La stagionatura è fondamentale per la durata: aspetta almeno {sito.stagionaturaGiorni}{' '}
+            giorni prima di accenderla.{' '}
+            <a href="/cura/" class="underline underline-offset-4 transition-colors hover:text-fiamma">
+              Tutte le avvertenze
+            </a>
+          </p>
+        )
+      }
+    </div>
+  </article>
+
+  {
+    altri.length > 0 && (
+      <section class="contenitore pb-6">
+        <h2 class="border-b border-lino pb-5 text-2xl sm:text-3xl">Dalla stessa collezione</h2>
+        <div class="mt-8 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
+          {altri.map((p) => (
+            <ProdottoCard prodotto={p} />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <script type="application/ld+json" set:html={JSON.stringify(datiStrutturati)} is:inline />
+</Base>

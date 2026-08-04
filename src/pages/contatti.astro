@@ -7,70 +7,91 @@ const faq = [
   {
     domanda: 'Come si ordina?',
     risposta:
-      'Scrivimi su WhatsApp o su Instagram dicendomi quale candela ti interessa e quante ne vuoi. Ti confermo disponibilità e totale, e ti mando i dettagli per il pagamento.',
+      'Scrivimi su WhatsApp o su Instagram dicendomi cosa ti interessa. Ti confermo disponibilità e totale, e ti mando i dettagli per il pagamento. Non c’è un carrello: preferisco parlare con chi compra.',
   },
   {
-    domanda: 'Quanto costa la spedizione?',
-    risposta: `${sito.spedizione.costo} in tutta Italia, gratis sopra ${sito.spedizione.gratisDa}. Consegna in ${sito.spedizione.tempi}. I barattoli viaggiano imballati singolarmente.`,
-  },
-  {
-    domanda: 'Posso ritirare di persona?',
+    domanda: 'Posso scegliere la fragranza?',
     risposta:
-      'Sì, se sei in zona ci mettiamo d’accordo e risparmi la spedizione. Scrivimi e organizziamo.',
+      'Sì. Le candele si possono profumare con una qualsiasi delle fragranze disponibili, elencate nella pagina Cura. Dimmi quale preferisci quando ordini.',
   },
   {
-    domanda: 'Fate bomboniere o regali aziendali?',
+    domanda: 'Posso scegliere i colori?',
     risposta:
-      'Sì, su ordinazione, con etichetta personalizzata. Servono almeno tre settimane di preavviso perché ogni lotto ha bisogno dei suoi tempi di riposo.',
+      'Sì, sia per le candele che per gli articoli in Jesmonite. Colori e composizioni sono personalizzabili: mandami un riferimento e vediamo cosa si può fare.',
   },
   {
-    domanda: 'Una candela è esaurita, quando torna?',
+    domanda: 'Cosa vuol dire "stampo esclusivo"?',
     risposta:
-      'Le permanenti tornano di solito entro due o tre settimane. Le stagionali tornano nella loro stagione. Scrivimi e ti avviso appena il lotto è pronto.',
+      'Che quello stampo è stato creato da zero direttamente da Le CandLex. Quei pezzi non esistono in nessun altro catalogo.',
   },
   {
-    domanda: 'Sono adatte a chi ha allergie?',
+    domanda: 'Fate bomboniere?',
+    risposta: `Sì, e qualunque articolo a catalogo può diventarne una. La consulenza è gratuita, ma servono almeno ${sito.preavvisoBomboniereMesi} mesi di preavviso.`,
+  },
+  {
+    domanda: 'C’è un minimo d’ordine?',
+    risposta: `No. Però per ordini uguali o superiori a ${sito.omaggioDa} € c’è un omaggio a sorpresa.`,
+  },
+  {
+    domanda: 'Un pezzo non è disponibile, quando torna?',
     risposta:
-      'Le fragranze contengono allergeni cosmetici dichiarati sull’etichetta di ogni barattolo. Se hai una sensibilità specifica scrivimi prima di ordinare e controllo insieme a te.',
+      'Dipende dal lotto e dalla stagione. Scrivimi e ti dico i tempi reali, oppure ti avviso appena è pronto.',
   },
 ];
 ---
 
 <Base
   titolo="Contatti"
-  descrizione="Come ordinare, spedizioni, tempi di consegna e risposte alle domande più frequenti."
+  descrizione="Come ordinare da Le CandLex, personalizzazioni, bomboniere e risposte alle domande più frequenti."
 >
-  <section class="contenitore grid gap-12 py-14 lg:grid-cols-2 lg:gap-16 lg:py-20">
+  <section class="contenitore grid gap-12 py-12 lg:grid-cols-2 lg:gap-16 lg:py-16">
     <div>
       <p class="occhiello">Contatti</p>
       <h1 class="mt-4 text-4xl sm:text-5xl">Scrivimi</h1>
       <p class="mt-6 max-w-md text-lg leading-relaxed text-fumo">
-        Non c’è un carrello e non è una dimenticanza: preferisco sapere chi compra le mie candele.
-        Scrivimi e ne parliamo — rispondo di solito in giornata.
+        Ti rispondo io, non un servizio clienti. Se hai un'idea in testa e non sai se si può fare,
+        chiedimela: quasi sempre la risposta è sì.
       </p>
 
-      <div class="mt-9">
-        <BottoneWhatsApp messaggio="Ciao! Vorrei qualche informazione sulle candele." />
+      <div class="mt-8">
+        <BottoneWhatsApp messaggio="Ciao Alessia! Vorrei qualche informazione." />
       </div>
 
       <dl class="mt-10 space-y-5 border-t border-lino pt-8 text-sm">
         <div>
+          <dt class="text-fumo">Telefono</dt>
+          <dd class="mt-1">{sito.telefonoLeggibile}</dd>
+        </div>
+        <div>
           <dt class="text-fumo">Instagram</dt>
           <dd class="mt-1">
-            <a class="underline underline-offset-4 transition-colors hover:text-fiamma" href={linkInstagram} rel="me noopener">
+            <a
+              class="underline underline-offset-4 transition-colors hover:text-fiamma"
+              href={linkInstagram}
+              rel="me noopener"
+            >
               @{sito.instagram}
             </a>
           </dd>
         </div>
         <div>
+          <dt class="text-fumo">Facebook</dt>
+          <dd class="mt-1">{sito.facebook}</dd>
+        </div>
+        <div>
           <dt class="text-fumo">Email</dt>
           <dd class="mt-1">
-            <a class="underline underline-offset-4 transition-colors hover:text-fiamma" href={`mailto:${sito.email}`}>
+            <a
+              class="underline underline-offset-4 transition-colors hover:text-fiamma"
+              href={`mailto:${sito.email}`}
+            >
               {sito.email}
             </a>
           </dd>
         </div>
       </dl>
+
+      <p class="mt-8 text-sm text-fumo">Seguimi su Instagram e taggami nelle tue foto.</p>
     </div>
 
     <div>

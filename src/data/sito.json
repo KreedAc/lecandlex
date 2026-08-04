@@ -1,16 +1,22 @@
 {
-  "nome": "LeCandleX",
-  "sottotitolo": "Candele di soia colate a mano",
-  "claim": "Piccoli lotti, cera di soia e profumi scelti uno per uno.",
-  "descrizione": "Candele artigianali in cera di soia, colate a mano in piccoli lotti. Profumazioni curate, contenitori riutilizzabili, nessuna produzione industriale.",
-  "email": "ciao@esempio.it",
-  "whatsapp": "393000000000",
-  "instagram": "lecandlex",
+  "nome": "Le CandLex",
+  "sottotitolo": "Candele | Arredo | Eventi",
+  "claim": "Accendi un sogno e lascialo bruciare in te",
+  "descrizione": "Candele scultura e complementi d'arredo in ceramica, fatti a mano con materiali 100% naturali e non testati sugli animali. Bomboniere e composizioni personalizzate.",
+  "titolare": "Alessia Vanni",
+  "email": "lecandlexart@gmail.com",
+  "whatsapp": "393459190403",
+  "telefonoLeggibile": "345 91 90 403",
+  "instagram": "le_candlex_lab",
+  "facebook": "le candlex lab",
   "citta": "Italia",
+  "omaggioDa": 50,
+  "preavvisoBomboniereMesi": 2,
+  "stagionaturaGiorni": 5,
   "spedizione": {
-    "costo": "5,90 €",
-    "gratisDa": "49 €",
-    "tempi": "2-4 giorni lavorativi",
+    "costo": "DA CONFERMARE",
+    "gratisDa": "DA CONFERMARE",
+    "tempi": "DA CONFERMARE",
     "ritiroInPersona": true
   }
 }

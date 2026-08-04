@@ -2,65 +2,67 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import BottoneWhatsApp from '../components/BottoneWhatsApp.astro';
-import fotoAtelier from '../assets/candele/atelier.jpg';
+import { sito } from '../lib/sito';
+import ritratto from '../assets/alessia.jpg';
 ---
 
 <Base
-  titolo="La storia"
-  descrizione="Chi c'è dietro le candele, come è cominciata e perché continuano a essere fatte a mano in piccoli lotti."
+  titolo="Chi sono"
+  descrizione="Dietro Le CandLex c'è Alessia Vanni: perché candele e ceramiche, e perché materiali 100% naturali."
 >
-  <section class="contenitore py-14 lg:py-20">
-    <p class="occhiello">Chi sono</p>
+  <section class="contenitore py-12 lg:py-16">
+    <p class="occhiello">Qualcosa di me</p>
     <h1 class="mt-4 max-w-3xl text-4xl leading-tight sm:text-5xl">
-      Ho iniziato perché non trovavo una candela che mi piacesse davvero.
+      Dietro Le CandLex ci sono io.
     </h1>
   </section>
 
-  <div class="contenitore">
+  <div class="contenitore grid gap-10 pb-12 lg:grid-cols-[2fr_3fr] lg:gap-16">
     <Image
-      src={fotoAtelier}
-      alt="Il piano di lavoro con cera, stoppini e barattoli pronti per essere colati"
-      widths={[600, 900, 1400]}
-      sizes="(min-width: 1152px) 72rem, 92vw"
-      class="aspect-3/2 w-full rounded-lg object-cover"
+      src={ritratto}
+      alt={`${sito.titolare}, fondatrice di Le CandLex`}
+      widths={[400, 600, 900]}
+      sizes="(min-width: 1024px) 24rem, 92vw"
+      class="w-full rounded-lg object-cover lg:sticky lg:top-24 lg:self-start"
     />
+
+    <!-- Testo di Alessia, dal catalogo. Non riscriverlo per renderlo piu'
+         "professionale": funziona proprio perche' suona come lei. -->
+    <div class="space-y-5 text-lg leading-relaxed text-fumo">
+      <p>Mi chiamo Alessia, amo gli animali e la natura.</p>
+      <p>
+        Dicono di me che sono una persona «frizzante», iperattiva, ed in effetti lo sono. Mi piace
+        avere sempre nuove idee, sperimentare e creare cose nuove. Le CandLex nasce proprio da qui.
+      </p>
+      <p>Perché candele e ceramiche? Le amo follemente!</p>
+      <p>
+        Ma soprattutto mi piace sapere di poter creare qualcosa senza recare danno. I prodotti che
+        uso sono 100% naturali e non testati sugli animali, quindi mi rendono libera di dar sfogo
+        alle mie idee, cercando di dare quel tocco in più che possa essere il mio tocco distintivo.
+      </p>
+      <p>Sono una sognatrice, lo so.</p>
+      <p>
+        Ma rivolgo a me stessa l'augurio di potervi trasmettere questo amore con le mie creazioni
+        cosicché possiate vivere la magia che provo io nel crearle.
+      </p>
+
+      <p class="border-t border-lino pt-8 font-display text-2xl leading-snug text-inchiostro">
+        {sito.claim}
+      </p>
+      <p class="font-display text-xl text-fumo">{sito.titolare}</p>
+    </div>
   </div>
 
-  <!-- Testo segnaposto: va sostituito con le sue parole, non riscritto meglio.
-       Questa e' la pagina che vende piu' del catalogo e funziona solo se
-       suona come lei. -->
-  <section class="contenitore max-w-2xl space-y-6 py-14 text-lg leading-relaxed text-fumo">
-    <p>
-      Le candele del supermercato profumano di detersivo e quelle costose nei negozi del centro
-      profumano di niente. È da questa piccola frustrazione che è partito tutto, in cucina, con
-      una pentola che non ho più usato per altro.
-    </p>
-    <p>
-      I primi lotti erano un disastro. La cera si crepava raffreddandosi, gli stoppini erano troppo
-      sottili e le candele scavavano un tunnel al centro lasciando due dita di cera attaccate al
-      vetro. Ci ho messo un anno a capire che quasi tutti i problemi di una candela si risolvono
-      prima: nella temperatura di colata e nella scelta dello stoppino.
-    </p>
-    <p>
-      Oggi lavoro con cera di soia al 100%, senza paraffina, e con fragranze che scelgo una a una —
-      ne provo molte di più di quelle che finiscono in vendita. Ogni lotto è di poche decine di
-      pezzi. Uno di ogni lotto lo accendo io e lo brucio fino in fondo: se non brucia pulito,
-      quel lotto non esce.
-    </p>
-    <p>
-      Non è un lavoro a tempo pieno e non voglio che lo diventi. Mi piace che ogni barattolo sia
-      passato dalle mie mani, e finché è così le quantità restano queste.
-    </p>
-  </section>
-
-  <section class="contenitore pb-16">
-    <div class="rounded-lg bg-sabbia p-8 text-center sm:p-12">
-      <h2 class="text-2xl sm:text-3xl">Hai una domanda?</h2>
-      <p class="mx-auto mt-3 max-w-md leading-relaxed text-fumo">
-        Scrivimi pure: rispondo io, non un servizio clienti.
+  <section class="contenitore pb-14">
+    <div class="rounded-lg bg-sabbia p-8 sm:p-12">
+      <h2 class="text-2xl sm:text-3xl">Gli stampi esclusivi</h2>
+      <p class="mt-3 max-w-2xl leading-relaxed text-fumo">
+        Alcuni pezzi del catalogo portano la dicitura «stampo esclusivo»: significa che quello
+        stampo è stato creato da zero, direttamente da Le CandLex. Non lo trovi in nessun altro
+        catalogo, perché non esiste altrove.
       </p>
       <div class="mt-7">
-        <BottoneWhatsApp messaggio="Ciao! Ho letto la tua storia e volevo chiederti una cosa." />
+        <BottoneWhatsApp messaggio="Ciao Alessia! Ho letto la tua storia e volevo chiederti una cosa." />
       </div>
     </div>
   </section>

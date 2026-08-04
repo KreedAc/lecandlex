@@ -12,34 +12,21 @@ site_url: https://lecandlex.pages.dev
 # Le foto vengono salvate in src/assets/ e non in public/, cosi' Astro le
 # ottimizza in AVIF/WebP. public_folder e' un percorso relativo al file .md
 # perche' e' cosi' che Astro risolve le immagini nelle content collections.
-media_folder: src/assets/candele
-public_folder: ../../assets/candele
+media_folder: src/assets/prodotti
+public_folder: ../../assets/prodotti
 
 collections:
-  - name: candele
-    label: Candele
-    label_singular: Candela
-    folder: src/content/candele
+  - name: prodotti
+    label: Prodotti
+    label_singular: Prodotto
+    folder: src/content/prodotti
     create: true
     slug: '{{slug}}'
     identifier_field: nome
-    summary: '{{nome}} — {{prezzo}} €'
+    summary: '{{nome}}'
     sortable_fields: [ordine, nome, prezzo]
     fields:
-      - { name: nome, label: Nome della candela, widget: string }
-
-      - name: estratto
-        label: Frase breve
-        widget: string
-        hint: Una riga sola, appare sotto il nome nel catalogo. Massimo 180 caratteri.
-        pattern: ['^.{1,180}$', 'Massimo 180 caratteri']
-
-      - name: prezzo
-        label: Prezzo in euro
-        widget: number
-        value_type: float
-        min: 0
-        hint: Solo il numero, senza il simbolo €.
+      - { name: nome, label: Nome, widget: string }
 
       - name: collezione
         label: Collezione
@@ -48,17 +35,36 @@ collections:
         search_fields: [nome]
         value_field: '{{slug}}'
         display_fields: [nome]
+
+      - name: prezzo
+        label: Prezzo in euro
+        widget: number
+        value_type: float
+        min: 0
         required: false
+        hint: Solo il numero, senza €. Lascialo vuoto se il prodotto ha più formati.
+
+      - name: varianti
+        label: Formati (se ce n'è più di uno)
+        widget: list
+        required: false
+        label_singular: Formato
+        hint: Usa questo solo per articoli che esistono in più taglie, tipo L e S.
+        fields:
+          - { name: nome, label: Nome del formato, widget: string, hint: 'Esempio - Grande, Piccolo, Max' }
+          - { name: prezzo, label: Prezzo in euro, widget: number, value_type: float, min: 0 }
+          - { name: pesoGrammi, label: Peso in grammi, widget: number, value_type: int, required: false }
+          - { name: dimensioni, label: Dimensioni, widget: string, required: false }
 
       - name: copertina
         label: Foto principale
         widget: image
-        hint: Formato verticale. È la foto che si vede nel catalogo.
+        hint: È la foto che si vede nel catalogo.
 
       - name: altCopertina
-        label: Descrizione della foto principale
+        label: Descrizione della foto
         widget: string
-        hint: Serve a chi non vede le immagini e a Google. Esempio: "Candela in barattolo ambrato, accesa, su un tavolo di legno".
+        hint: Serve a chi non vede le immagini e a Google. Esempio - "Candela a forma di gufo, color panna, su un tronchetto di legno".
 
       - name: galleria
         label: Altre foto
@@ -69,31 +75,41 @@ collections:
           - { name: file, label: Foto, widget: image }
           - { name: alt, label: Descrizione della foto, widget: string }
 
-      - name: note
-        label: Note olfattive
-        widget: object
-        collapsed: false
-        fields:
-          - name: testa
-            label: Note di testa
-            widget: list
-            required: false
-            hint: Quello che senti appena apri il barattolo.
-          - name: cuore
-            label: Note di cuore
-            widget: list
-            required: false
-            hint: Quello che resta mentre brucia.
-          - name: fondo
-            label: Note di fondo
-            widget: list
-            required: false
-            hint: Quello che rimane nella stanza dopo.
+      - name: materiale
+        label: Materiale
+        widget: select
+        default: cera
+        options:
+          - { label: Cera, value: cera }
+          - { label: Ceramica, value: ceramica }
+          - { label: Jesmonite, value: jesmonite }
+          - { label: Resina, value: resina }
+          - { label: Vetro, value: vetro }
+          - { label: Materiali misti, value: misto }
 
-      - { name: cera, label: Cera, widget: string, default: 'Cera di soia 100%' }
-      - { name: stoppino, label: Stoppino, widget: string, default: 'Cotone naturale' }
       - { name: pesoGrammi, label: Peso in grammi, widget: number, value_type: int, required: false }
-      - { name: durataOre, label: Durata in ore, widget: number, value_type: int, required: false }
+
+      - name: dimensioni
+        label: Dimensioni
+        widget: string
+        required: false
+        hint: Base x altezza, come nel catalogo. Esempio - 6x8 cm
+
+      - name: stampoEsclusivo
+        label: Stampo esclusivo
+        widget: boolean
+        default: false
+        hint: Accendilo se lo stampo l'hai creato tu. Compare come badge sul prodotto.
+
+      - name: personalizzabile
+        label: Personalizzabile nei colori
+        widget: boolean
+        default: false
+
+      - name: profumabile
+        label: Si può profumare
+        widget: boolean
+        default: true
 
       - name: disponibile
         label: Disponibile
@@ -101,10 +117,7 @@ collections:
         default: true
         hint: Se lo spegni, la scheda resta online e mostra "In preparazione".
 
-      - name: inEvidenza
-        label: Mostra in home
-        widget: boolean
-        default: false
+      - { name: inEvidenza, label: Mostra in home, widget: boolean, default: false }
 
       - name: ordine
         label: Ordine
@@ -113,10 +126,25 @@ collections:
         default: 100
         hint: Numero più basso = compare prima.
 
+      - name: nota
+        label: Nota
+        widget: string
+        required: false
+        hint: Vincoli o supplementi. Esempio - "disponibile solo in ceramica", "piedistallo +1€".
+
+      - name: estratto
+        label: Frase breve
+        widget: string
+        required: false
+        hint: Una riga sola, massimo 180 caratteri.
+        pattern: ['^.{0,180}$', 'Massimo 180 caratteri']
+
+      - { name: paginaCatalogo, label: Pagina del catalogo Canva, widget: number, value_type: int, required: false }
+
       - name: body
-        label: Racconto
+        label: Descrizione
         widget: markdown
-        hint: Perché l'hai fatta, com'è nata, dove sta bene. È la parte che vende.
+        required: false
 
   - name: collezioni
     label: Collezioni
@@ -128,6 +156,8 @@ collections:
     fields:
       - { name: nome, label: Nome, widget: string }
       - { name: descrizione, label: Descrizione, widget: text }
+      - { name: copertina, label: Foto di copertina, widget: image, required: false }
+      - { name: altCopertina, label: Descrizione della foto, widget: string, required: false }
       - { name: ordine, label: Ordine, widget: number, value_type: int, default: 100 }
 
   - name: impostazioni
@@ -141,14 +171,20 @@ collections:
           - { name: sottotitolo, label: Sottotitolo, widget: string }
           - { name: claim, label: Frase di presentazione, widget: string }
           - { name: descrizione, label: Descrizione per Google, widget: text }
+          - { name: titolare, label: Nome e cognome, widget: string }
           - { name: email, label: Email, widget: string }
           - name: whatsapp
             label: Numero WhatsApp
             widget: string
-            hint: Formato internazionale senza + e senza spazi. Esempio - 393331234567
+            hint: Formato internazionale senza + e senza spazi. Esempio - 393459190403
             pattern: ['^[0-9]{8,15}$', 'Solo cifre, senza + e senza spazi']
+          - { name: telefonoLeggibile, label: Telefono come si legge, widget: string }
           - { name: instagram, label: Nome utente Instagram, widget: string, hint: Senza la chiocciola. }
+          - { name: facebook, label: Pagina Facebook, widget: string }
           - { name: citta, label: Città o zona, widget: string }
+          - { name: omaggioDa, label: Omaggio a partire da (euro), widget: number, value_type: int }
+          - { name: preavvisoBomboniereMesi, label: Preavviso bomboniere (mesi), widget: number, value_type: int }
+          - { name: stagionaturaGiorni, label: Giorni di stagionatura, widget: number, value_type: int }
           - name: spedizione
             label: Spedizioni
             widget: object
@@ -157,3 +193,12 @@ collections:
               - { name: gratisDa, label: Gratis a partire da, widget: string }
               - { name: tempi, label: Tempi di consegna, widget: string }
               - { name: ritiroInPersona, label: Ritiro di persona possibile, widget: boolean, default: true }
+
+      - name: fragranze
+        label: Elenco fragranze
+        file: src/data/fragranze.json
+        fields:
+          - name: fragranze
+            label: Fragranze
+            widget: list
+            field: { name: nome, label: Fragranza, widget: string }

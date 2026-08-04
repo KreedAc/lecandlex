@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import ProdottoCard from '../../components/ProdottoCard.astro';
+
+const prodotti = await getCollection('prodotti');
+const collezioni = (await getCollection('collezioni')).sort(
+  (a, b) => a.data.ordine - b.data.ordine
+);
+
+const gruppi = collezioni
+  .map((collezione) => ({
+    collezione,
+    prodotti: prodotti
+      .filter((p) => p.data.collezione.id === collezione.id)
+      .sort((a, b) => a.data.ordine - b.data.ordine),
+  }))
+  .filter((g) => g.prodotti.length > 0);
+
+// Le collezioni gia' create ma ancora senza prodotti restano elencate:
+// servono a far vedere che il catalogo e' piu' ampio di quanto e' online.
+const inArrivo = collezioni.filter(
+  (c) => !prodotti.some((p) => p.data.collezione.id === c.id)
+);
+---
+
+<Base
+  titolo="Catalogo"
+  descrizione="Candele scultura, candele profumate e complementi d'arredo in ceramica, divisi per collezione."
+>
+  <section class="contenitore py-12 lg:py-16">
+    <p class="occhiello">Catalogo</p>
+    <h1 class="mt-4 text-4xl sm:text-5xl">Le collezioni</h1>
+    <p class="mt-5 max-w-xl leading-relaxed text-fumo">
+      Ogni scheda riporta peso e dimensioni reali. Le misure in centimetri corrispondono sempre a
+      base × altezza.
+    </p>
+  </section>
+
+  {
+    gruppi.map(({ collezione, prodotti: elenco }) => (
+      <section class="contenitore pb-14">
+        <div class="border-b border-lino pb-5">
+          <h2 class="text-2xl sm:text-3xl">{collezione.data.nome}</h2>
+          <p class="mt-2 max-w-xl text-sm leading-relaxed text-fumo">
+            {collezione.data.descrizione}
+          </p>
+        </div>
+        <div class="mt-8 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
+          {elenco.map((prodotto, i) => (
+            <ProdottoCard prodotto={prodotto} priorita={i < 4} />
+          ))}
+        </div>
+      </section>
+    ))
+  }
+
+  {
+    inArrivo.length > 0 && (
+      <section class="contenitore pb-14">
+        <div class="rounded-lg bg-sabbia p-8 sm:p-10">
+          <h2 class="text-2xl">Altre collezioni in arrivo online</h2>
+          <p class="mt-3 max-w-2xl leading-relaxed text-fumo">
+            Queste collezioni esistono a catalogo ma non sono ancora state pubblicate qui. Se cerchi
+            qualcosa in particolare, scrivimi: te lo mando in foto.
+          </p>
+          <ul class="mt-6 flex flex-wrap gap-2">
+            {inArrivo.map((c) => (
+              <li class="rounded-full border border-lino bg-crema px-4 py-1.5 text-sm">
+                {c.data.nome}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+</Base>

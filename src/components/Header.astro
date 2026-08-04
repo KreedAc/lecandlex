@@ -3,27 +3,33 @@ import { sito } from '../lib/sito';
 
 const percorso = Astro.url.pathname;
 const voci = [
-  { href: '/candele/', testo: 'Le candele' },
-  { href: '/storia/', testo: 'La storia' },
-  { href: '/cura/', testo: 'Cura della candela' },
+  { href: '/catalogo/', testo: 'Catalogo' },
+  { href: '/eventi/', testo: 'Bomboniere' },
+  { href: '/storia/', testo: 'Chi sono' },
+  { href: '/cura/', testo: 'Cura' },
   { href: '/contatti/', testo: 'Contatti' },
 ];
 
 const attiva = (href: string) => percorso === href || percorso.startsWith(href);
 ---
 
-<header class="border-b border-lino bg-crema/90 backdrop-blur-sm sticky top-0 z-40">
-  <!-- Su mobile logo e navigazione stanno su due righe: a 390px affiancarli
-       tagliava l'ultima voce a meta'. La nav scorre in orizzontale invece di
-       nascondersi dietro un hamburger — quattro voci non giustificano un menu
-       a tendina, e un link sempre visibile viene cliccato molto di piu'. -->
-  <div class="contenitore flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-4">
+<!-- Su mobile logo e navigazione stanno su due righe: a 390px affiancarli
+     tagliava l'ultima voce a meta'. La nav scorre in orizzontale invece di
+     nascondersi dietro un hamburger — cinque voci brevi non giustificano un
+     menu a tendina, e un link sempre visibile viene cliccato molto di piu'. -->
+<header class="sticky top-0 z-40 border-b border-lino bg-crema/90 backdrop-blur-sm">
+  <div
+    class="contenitore flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-4"
+  >
     <a href="/" class="font-display text-2xl leading-none tracking-tight">
       {sito.nome}
     </a>
 
-    <nav aria-label="Principale" class="-mx-6 overflow-x-auto px-6 sm:mx-0 sm:overflow-visible sm:px-0">
-      <ul class="flex items-center gap-5 whitespace-nowrap text-sm sm:gap-7">
+    <nav
+      aria-label="Principale"
+      class="-mx-6 overflow-x-auto px-6 sm:mx-0 sm:overflow-visible sm:px-0"
+    >
+      <ul class="flex items-center gap-5 whitespace-nowrap text-sm sm:gap-6">
         {
           voci.map((voce) => (
             <li>

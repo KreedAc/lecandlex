@@ -1,0 +1,86 @@
+---
+import Base from '../layouts/Base.astro';
+import BottoneWhatsApp from '../components/BottoneWhatsApp.astro';
+import { sito } from '../lib/sito';
+
+const passi = [
+  {
+    titolo: 'Scrivimi con largo anticipo',
+    testo: `Servono almeno ${sito.preavvisoBomboniereMesi} mesi di preavviso. Ogni pezzo è colato a mano e ha bisogno dei suoi tempi, compresa la stagionatura.`,
+  },
+  {
+    titolo: 'Scegliamo insieme',
+    testo:
+      'La consulenza è gratuita. Guardiamo il catalogo, la fragranza e i colori, e capiamo cosa sta bene con il tuo evento.',
+  },
+  {
+    titolo: 'Preparo tutto a mano',
+    testo:
+      'Fragranza e colori sono a scelta. Su richiesta aggiungo scritte personalizzate e confezioni coordinate.',
+  },
+];
+---
+
+<Base
+  titolo="Bomboniere ed eventi"
+  descrizione="Bomboniere personalizzate e bouquet di candele per matrimoni, battesimi, nascite e ricorrenze. Consulenza gratuita."
+>
+  <section class="contenitore py-12 lg:py-16">
+    <p class="occhiello">Rendi speciali i tuoi eventi</p>
+    <h1 class="mt-4 max-w-2xl text-4xl leading-tight sm:text-5xl">
+      Personalizza la tua bomboniera
+    </h1>
+    <p class="mt-6 max-w-xl text-lg leading-relaxed text-fumo">
+      Consulenza gratuita e attenzione al dettaglio per ogni tua occasione. Possono essere scelti
+      come bomboniera <strong class="font-medium text-inchiostro">tutti</strong> gli articoli
+      presenti a catalogo.
+    </p>
+    <div class="mt-8">
+      <BottoneWhatsApp messaggio="Ciao Alessia! Vorrei informazioni per delle bomboniere." />
+    </div>
+  </section>
+
+  <section class="contenitore pb-14">
+    <ol class="grid gap-x-10 gap-y-9 sm:grid-cols-3">
+      {
+        passi.map((passo, i) => (
+          <li class="border-t border-lino pt-6">
+            <span class="font-display text-3xl text-lino">{String(i + 1).padStart(2, '0')}</span>
+            <h2 class="mt-2 text-xl">{passo.titolo}</h2>
+            <p class="mt-3 leading-relaxed text-fumo">{passo.testo}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section class="contenitore pb-14">
+    <div class="rounded-lg bg-sabbia p-8 sm:p-12">
+      <h2 class="text-2xl sm:text-3xl">Bouquet personalizzati</h2>
+      <p class="mt-4 max-w-xl leading-relaxed text-fumo">
+        Un'alternativa ai fiori che non appassisce. La composizione prevede:
+      </p>
+      <ul class="mt-5 space-y-2 text-fumo">
+        <li class="flex gap-3">
+          <span class="text-fiamma" aria-hidden="true">•</span> Scatola, colore a scelta
+        </li>
+        <li class="flex gap-3">
+          <span class="text-fiamma" aria-hidden="true">•</span> Candele a tema
+        </li>
+        <li class="flex gap-3">
+          <span class="text-fiamma" aria-hidden="true">•</span> Scritta personalizzata
+        </li>
+      </ul>
+      <p class="mt-6 text-sm text-fumo">
+        Per dare un'idea: un bouquet nascita o Natale da 12 cm di diametro costa 35 €.
+      </p>
+      <div class="mt-7">
+        <BottoneWhatsApp
+          variante="contorno"
+          messaggio="Ciao Alessia! Vorrei informazioni su un bouquet personalizzato."
+          testo="Chiedi un bouquet"
+        />
+      </div>
+    </div>
+  </section>
+</Base>
