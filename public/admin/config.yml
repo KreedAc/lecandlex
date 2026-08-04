@@ -12,6 +12,9 @@ backend:
   # costruisce il sito. Se non coincidono, le modifiche fatte dal pannello
   # vengono salvate su un branch che nessuno pubblica: sembrano sparite.
   branch: main
+  # Il login e' gestito dallo stesso Worker che serve il sito (worker/index.js),
+  # quindi qui va l'indirizzo del sito stesso. Se cambi dominio, cambia anche
+  # questa riga: e' l'unico posto del pannello che non lo segue da solo.
   base_url: https://lecandlex.giovanniavignone.workers.dev
 
 locale: it

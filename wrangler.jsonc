@@ -1,0 +1,28 @@
+{
+  // Configurazione del deploy su Cloudflare Workers.
+  //
+  // Nel pannello di Cloudflare i campi "framework" e "cartella di output"
+  // non esistono: le impostazioni stanno qui. Nel pannello servono solo
+  //   Build command:  npm run build
+  //   Deploy command: npx wrangler deploy
+  //
+  // Il branch di produzione e' quello predefinito del repository (main).
+  "name": "lecandlex",
+  "main": "worker/index.js",
+  "compatibility_date": "2025-11-01",
+
+  "assets": {
+    // La cartella che produce `npm run build`. Senza questa riga Wrangler
+    // non sa cosa pubblicare, ed e' il motivo per cui le immagini non
+    // venivano servite.
+    "directory": "./dist",
+    "binding": "ASSETS",
+    // Gli indirizzi inesistenti mostrano la nostra pagina 404 invece di
+    // quella grigia di Cloudflare.
+    "not_found_handling": "404-page"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}

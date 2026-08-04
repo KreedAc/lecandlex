@@ -85,38 +85,41 @@ Ogni push sul branch di produzione ridistribuisce il sito automaticamente.
 Si parte con il `.pages.dev` gratuito e si collega il dominio comprato quando
 si vuole, senza rifare niente. Al momento del passaggio:
 
-1. Cloudflare Pages → *Custom domains* → aggiungi il dominio
+1. Cloudflare → il Worker → *Domains & Routes* → aggiungi il dominio
 2. Cambia la variabile `SITE_URL` con il nuovo indirizzo e rilancia il deploy
-3. Aggiorna `ALLOWED_DOMAINS` nel Worker OAuth, altrimenti il pannello
-   `/admin` smette di far entrare
+3. Aggiorna `base_url` e `site_url` in `public/admin/config.yml`
+4. Aggiorna il *callback URL* della OAuth App su GitHub con il nuovo dominio
 
-Il dominio vive solo in `SITE_URL`: sitemap, canonical, anteprime social e
-`robots.txt` lo seguono da soli. L'unica eccezione è `site_url` in
-`public/admin/config.yml`, che serve al link "vedi il sito" dentro il pannello.
+Il dominio vive in `SITE_URL`: sitemap, canonical, anteprime social e
+`robots.txt` lo seguono da soli. Le uniche righe da cambiare a mano sono
+quelle in `public/admin/config.yml`, perché è un file statico letto dal
+browser e non passa dalla build.
 
 ## Attivare il CMS
 
-Il pannello sta su `/admin`. Per farlo funzionare serve un piccolo Worker che
-gestisca il login GitHub — è gratuito e si configura una volta sola.
+Il pannello sta su `/admin`. Il login GitHub è gestito dallo stesso Worker che
+serve il sito (`worker/index.js`), quindi non serve distribuire nulla di
+separato: bastano due variabili.
 
 1. **GitHub OAuth App** — su GitHub, *Settings* → *Developer settings* →
    *OAuth Apps* → *New OAuth App*.
    - *Homepage URL*: l'indirizzo del sito
-   - *Authorization callback URL*: `https://IL-TUO-WORKER.workers.dev/callback`
+   - *Authorization callback URL*: l'indirizzo del sito seguito da `/callback`
    - Annota **Client ID** e **Client Secret**
 
-2. **Worker** — clona
-   [`sveltia/sveltia-cms-auth`](https://github.com/sveltia/sveltia-cms-auth) e
-   distribuiscilo su Cloudflare Workers. Imposta come variabili d'ambiente
-   (cifrate) `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` e `ALLOWED_DOMAINS`
-   con il dominio del sito.
+2. **Variabili** — su Cloudflare, nelle impostazioni del Worker, aggiungi:
+   - `GITHUB_CLIENT_ID` — variabile normale
+   - `GITHUB_CLIENT_SECRET` — **cifrata** (spunta *Encrypt*)
 
-3. **Collega** — in `public/admin/config.yml` sostituisci `base_url` con
-   l'indirizzo del Worker, e verifica che `repo` e `branch` siano corretti.
+3. **Collega** — in `public/admin/config.yml` verifica che `base_url` sia
+   l'indirizzo del sito e che `repo` e `branch` siano corretti.
 
 4. **Accesso** — l'account GitHub di Alessia va aggiunto come collaboratore del
    repository. Da quel momento può modificare tutto da `/admin`, anche dal
    telefono: ogni salvataggio è un commit, e il sito si ricostruisce da solo.
+
+Il Worker espone solo `/auth` e `/callback`; tutto il resto viene servito come
+sito statico. Il client secret non sta mai nel repository.
 
 ## Da sistemare prima di andare online
 
