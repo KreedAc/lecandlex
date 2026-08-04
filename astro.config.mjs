@@ -25,6 +25,13 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  build: {
+    // Di default Astro mette CSS, font e immagini in `_astro`. Il nome
+    // inizia con underscore, e diverse piattaforme di hosting trattano in
+    // modo speciale i percorsi che cominciano cosi'. Una cartella dal nome
+    // normale toglie di mezzo un'intera classe di problemi di deploy.
+    assets: 'risorse',
+  },
   image: {
     // Le foto delle candele sono il contenuto principale: le serviamo
     // in AVIF/WebP responsive invece dei JPEG originali da 4 MB.
