@@ -1,0 +1,42 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import { prezzo } from '../lib/sito';
+
+interface Props {
+  candela: CollectionEntry<'candele'>;
+  /** Le prime immagini della griglia non vanno caricate in lazy. */
+  priorita?: boolean;
+}
+
+const { candela, priorita = false } = Astro.props;
+const { nome, copertina, altCopertina, estratto, prezzo: valore, disponibile } = candela.data;
+---
+
+<article class="group">
+  <a href={`/candele/${candela.id}/`} class="block">
+    <div class="relative overflow-hidden rounded-lg bg-sabbia">
+      <Image
+        src={copertina}
+        alt={altCopertina}
+        widths={[300, 500, 800]}
+        sizes="(min-width: 1024px) 22rem, (min-width: 640px) 45vw, 90vw"
+        loading={priorita ? 'eager' : 'lazy'}
+        class="aspect-4/5 w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+      />
+      {
+        !disponibile && (
+          <span class="absolute top-3 left-3 rounded-full bg-crema/95 px-3 py-1 text-xs font-medium text-fumo">
+            In preparazione
+          </span>
+        )
+      }
+    </div>
+
+    <div class="mt-4">
+      <h3 class="text-xl transition-colors group-hover:text-fiamma">{nome}</h3>
+      <p class="mt-1.5 text-sm leading-relaxed text-fumo">{estratto}</p>
+      <p class="mt-3 text-sm font-medium">{prezzo(valore)}</p>
+    </div>
+  </a>
+</article>

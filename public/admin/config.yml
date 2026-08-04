@@ -1,0 +1,159 @@
+backend:
+  name: github
+  repo: KreedAc/lecandlex
+  branch: main
+  # Worker OAuth su Cloudflare: vedi README, sezione "Attivare il CMS".
+  base_url: https://CAMBIAMI.workers.dev
+
+locale: it
+publish_mode: simple
+site_url: https://lecandlex.pages.dev
+
+# Le foto vengono salvate in src/assets/ e non in public/, cosi' Astro le
+# ottimizza in AVIF/WebP. public_folder e' un percorso relativo al file .md
+# perche' e' cosi' che Astro risolve le immagini nelle content collections.
+media_folder: src/assets/candele
+public_folder: ../../assets/candele
+
+collections:
+  - name: candele
+    label: Candele
+    label_singular: Candela
+    folder: src/content/candele
+    create: true
+    slug: '{{slug}}'
+    identifier_field: nome
+    summary: '{{nome}} — {{prezzo}} €'
+    sortable_fields: [ordine, nome, prezzo]
+    fields:
+      - { name: nome, label: Nome della candela, widget: string }
+
+      - name: estratto
+        label: Frase breve
+        widget: string
+        hint: Una riga sola, appare sotto il nome nel catalogo. Massimo 180 caratteri.
+        pattern: ['^.{1,180}$', 'Massimo 180 caratteri']
+
+      - name: prezzo
+        label: Prezzo in euro
+        widget: number
+        value_type: float
+        min: 0
+        hint: Solo il numero, senza il simbolo €.
+
+      - name: collezione
+        label: Collezione
+        widget: relation
+        collection: collezioni
+        search_fields: [nome]
+        value_field: '{{slug}}'
+        display_fields: [nome]
+        required: false
+
+      - name: copertina
+        label: Foto principale
+        widget: image
+        hint: Formato verticale. È la foto che si vede nel catalogo.
+
+      - name: altCopertina
+        label: Descrizione della foto principale
+        widget: string
+        hint: Serve a chi non vede le immagini e a Google. Esempio: "Candela in barattolo ambrato, accesa, su un tavolo di legno".
+
+      - name: galleria
+        label: Altre foto
+        widget: list
+        required: false
+        label_singular: Foto
+        fields:
+          - { name: file, label: Foto, widget: image }
+          - { name: alt, label: Descrizione della foto, widget: string }
+
+      - name: note
+        label: Note olfattive
+        widget: object
+        collapsed: false
+        fields:
+          - name: testa
+            label: Note di testa
+            widget: list
+            required: false
+            hint: Quello che senti appena apri il barattolo.
+          - name: cuore
+            label: Note di cuore
+            widget: list
+            required: false
+            hint: Quello che resta mentre brucia.
+          - name: fondo
+            label: Note di fondo
+            widget: list
+            required: false
+            hint: Quello che rimane nella stanza dopo.
+
+      - { name: cera, label: Cera, widget: string, default: 'Cera di soia 100%' }
+      - { name: stoppino, label: Stoppino, widget: string, default: 'Cotone naturale' }
+      - { name: pesoGrammi, label: Peso in grammi, widget: number, value_type: int, required: false }
+      - { name: durataOre, label: Durata in ore, widget: number, value_type: int, required: false }
+
+      - name: disponibile
+        label: Disponibile
+        widget: boolean
+        default: true
+        hint: Se lo spegni, la scheda resta online e mostra "In preparazione".
+
+      - name: inEvidenza
+        label: Mostra in home
+        widget: boolean
+        default: false
+
+      - name: ordine
+        label: Ordine
+        widget: number
+        value_type: int
+        default: 100
+        hint: Numero più basso = compare prima.
+
+      - name: body
+        label: Racconto
+        widget: markdown
+        hint: Perché l'hai fatta, com'è nata, dove sta bene. È la parte che vende.
+
+  - name: collezioni
+    label: Collezioni
+    label_singular: Collezione
+    folder: src/content/collezioni
+    create: true
+    slug: '{{slug}}'
+    identifier_field: nome
+    fields:
+      - { name: nome, label: Nome, widget: string }
+      - { name: descrizione, label: Descrizione, widget: text }
+      - { name: ordine, label: Ordine, widget: number, value_type: int, default: 100 }
+
+  - name: impostazioni
+    label: Impostazioni del sito
+    files:
+      - name: sito
+        label: Dati generali e contatti
+        file: src/data/sito.json
+        fields:
+          - { name: nome, label: Nome del marchio, widget: string }
+          - { name: sottotitolo, label: Sottotitolo, widget: string }
+          - { name: claim, label: Frase di presentazione, widget: string }
+          - { name: descrizione, label: Descrizione per Google, widget: text }
+          - { name: email, label: Email, widget: string }
+          - name: whatsapp
+            label: Numero WhatsApp
+            widget: string
+            hint: Formato internazionale senza + e senza spazi. Esempio - 393331234567
+            pattern: ['^[0-9]{8,15}$', 'Solo cifre, senza + e senza spazi']
+          - { name: instagram, label: Nome utente Instagram, widget: string, hint: Senza la chiocciola. }
+          - { name: citta, label: Città o zona, widget: string }
+          - name: spedizione
+            label: Spedizioni
+            widget: object
+            fields:
+              - { name: costo, label: Costo, widget: string }
+              - { name: gratisDa, label: Gratis a partire da, widget: string }
+              - { name: tempi, label: Tempi di consegna, widget: string }
+              - { name: ritiroInPersona, label: Ritiro di persona possibile, widget: boolean, default: true }

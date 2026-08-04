@@ -1,0 +1,94 @@
+@import 'tailwindcss';
+
+/* Font self-ospitati: nessuna chiamata a Google Fonts, quindi nessun
+   trasferimento di IP verso terzi (rilevante per il GDPR in UE). */
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource/cormorant-garamond/600.css';
+@import '@fontsource-variable/inter';
+
+/* ---------------------------------------------------------------------------
+   PALETTE — IL PUNTO DI SOSTITUZIONE
+
+   Questi sono gli unici valori da cambiare per adattare tutto il sito
+   all'identita visiva reale. Nient'altro nel progetto contiene un colore
+   scritto a mano: cambia qui e cambia ovunque.
+
+   I valori attuali sono un segnaposto caldo e neutro, scelti per non
+   litigare con nessuna palette. Tutte le combinazioni testo/sfondo qui
+   sotto superano il contrasto WCAG AA.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-crema: #faf7f2; /* sfondo pagina */
+  --color-sabbia: #f0e9df; /* superfici e card */
+  --color-lino: #e2d8ca; /* bordi e separatori */
+  --color-inchiostro: #241e1a; /* testo principale */
+  --color-fumo: #675d55; /* testo secondario  — 5.4:1 su crema */
+  --color-fiamma: #a2551f; /* accento           — 5.4:1 con bianco */
+  --color-fiamma-scuro: #82430f; /* accento in hover */
+  --color-salvia: #6f7d64; /* accento secondario */
+
+  --font-display: 'Cormorant Garamond', ui-serif, Georgia, serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-crema);
+    color: var(--color-inchiostro);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  /* Focus visibile e coerente ovunque: obbligatorio per chi naviga
+     da tastiera, e nessun browser lo rende bene di default. */
+  :focus-visible {
+    outline: 2px solid var(--color-fiamma);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Il contenitore standard di tutte le sezioni. */
+  .contenitore {
+    width: 100%;
+    max-width: 72rem;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+  }
+
+  .occhiello {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-fumo);
+  }
+}

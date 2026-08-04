@@ -1,0 +1,50 @@
+---
+import { sito, linkWhatsApp, linkInstagram } from '../lib/sito';
+
+const anno = new Date().getFullYear();
+---
+
+<footer class="mt-24 border-t border-lino bg-sabbia">
+  <div class="contenitore grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-3">
+    <div>
+      <p class="font-display text-2xl">{sito.nome}</p>
+      <p class="mt-2 max-w-xs text-sm leading-relaxed text-fumo">{sito.claim}</p>
+    </div>
+
+    <div>
+      <p class="occhiello">Scrivimi</p>
+      <ul class="mt-4 space-y-2 text-sm">
+        <li>
+          <a class="transition-colors hover:text-fiamma" href={linkWhatsApp('Ciao! Vorrei qualche informazione sulle candele.')}>
+            WhatsApp
+          </a>
+        </li>
+        <li>
+          <a class="transition-colors hover:text-fiamma" href={linkInstagram} rel="me noopener">
+            Instagram @{sito.instagram}
+          </a>
+        </li>
+        <li>
+          <a class="transition-colors hover:text-fiamma" href={`mailto:${sito.email}`}>{sito.email}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <p class="occhiello">Spedizioni</p>
+      <ul class="mt-4 space-y-2 text-sm text-fumo">
+        <li>{sito.spedizione.costo} in tutta Italia</li>
+        <li>Gratis sopra {sito.spedizione.gratisDa}</li>
+        <li>Consegna in {sito.spedizione.tempi}</li>
+        {sito.spedizione.ritiroInPersona && <li>Ritiro di persona su accordo</li>}
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-lino">
+    <div class="contenitore flex flex-wrap items-center justify-between gap-3 py-5 text-xs text-fumo">
+      <p>© {anno} {sito.nome}</p>
+      <p>Candele colate a mano in {sito.citta}</p>
+    </div>
+  </div>
+</footer>

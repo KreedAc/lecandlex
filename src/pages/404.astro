@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base titolo="Pagina non trovata" descrizione="La pagina cercata non esiste.">
+  <section class="contenitore py-24 text-center lg:py-32">
+    <p class="occhiello">Errore 404</p>
+    <h1 class="mt-4 text-4xl sm:text-5xl">Questa pagina si è spenta</h1>
+    <p class="mx-auto mt-5 max-w-md leading-relaxed text-fumo">
+      Il link potrebbe essere vecchio, oppure la candela che cercavi ha cambiato nome.
+    </p>
+    <a
+      href="/candele/"
+      class="mt-9 inline-flex items-center rounded-full bg-inchiostro px-7 py-3 text-sm font-medium text-crema transition-colors hover:bg-fiamma"
+    >
+      Vai al catalogo
+    </a>
+  </section>
+</Base>

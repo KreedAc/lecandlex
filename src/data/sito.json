@@ -1,0 +1,16 @@
+{
+  "nome": "LeCandleX",
+  "sottotitolo": "Candele di soia colate a mano",
+  "claim": "Piccoli lotti, cera di soia e profumi scelti uno per uno.",
+  "descrizione": "Candele artigianali in cera di soia, colate a mano in piccoli lotti. Profumazioni curate, contenitori riutilizzabili, nessuna produzione industriale.",
+  "email": "ciao@esempio.it",
+  "whatsapp": "393000000000",
+  "instagram": "lecandlex",
+  "citta": "Italia",
+  "spedizione": {
+    "costo": "5,90 €",
+    "gratisDa": "49 €",
+    "tempi": "2-4 giorni lavorativi",
+    "ritiroInPersona": true
+  }
+}

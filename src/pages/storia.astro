@@ -1,0 +1,67 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import BottoneWhatsApp from '../components/BottoneWhatsApp.astro';
+import fotoAtelier from '../assets/candele/atelier.jpg';
+---
+
+<Base
+  titolo="La storia"
+  descrizione="Chi c'è dietro le candele, come è cominciata e perché continuano a essere fatte a mano in piccoli lotti."
+>
+  <section class="contenitore py-14 lg:py-20">
+    <p class="occhiello">Chi sono</p>
+    <h1 class="mt-4 max-w-3xl text-4xl leading-tight sm:text-5xl">
+      Ho iniziato perché non trovavo una candela che mi piacesse davvero.
+    </h1>
+  </section>
+
+  <div class="contenitore">
+    <Image
+      src={fotoAtelier}
+      alt="Il piano di lavoro con cera, stoppini e barattoli pronti per essere colati"
+      widths={[600, 900, 1400]}
+      sizes="(min-width: 1152px) 72rem, 92vw"
+      class="aspect-3/2 w-full rounded-lg object-cover"
+    />
+  </div>
+
+  <!-- Testo segnaposto: va sostituito con le sue parole, non riscritto meglio.
+       Questa e' la pagina che vende piu' del catalogo e funziona solo se
+       suona come lei. -->
+  <section class="contenitore max-w-2xl space-y-6 py-14 text-lg leading-relaxed text-fumo">
+    <p>
+      Le candele del supermercato profumano di detersivo e quelle costose nei negozi del centro
+      profumano di niente. È da questa piccola frustrazione che è partito tutto, in cucina, con
+      una pentola che non ho più usato per altro.
+    </p>
+    <p>
+      I primi lotti erano un disastro. La cera si crepava raffreddandosi, gli stoppini erano troppo
+      sottili e le candele scavavano un tunnel al centro lasciando due dita di cera attaccate al
+      vetro. Ci ho messo un anno a capire che quasi tutti i problemi di una candela si risolvono
+      prima: nella temperatura di colata e nella scelta dello stoppino.
+    </p>
+    <p>
+      Oggi lavoro con cera di soia al 100%, senza paraffina, e con fragranze che scelgo una a una —
+      ne provo molte di più di quelle che finiscono in vendita. Ogni lotto è di poche decine di
+      pezzi. Uno di ogni lotto lo accendo io e lo brucio fino in fondo: se non brucia pulito,
+      quel lotto non esce.
+    </p>
+    <p>
+      Non è un lavoro a tempo pieno e non voglio che lo diventi. Mi piace che ogni barattolo sia
+      passato dalle mie mani, e finché è così le quantità restano queste.
+    </p>
+  </section>
+
+  <section class="contenitore pb-16">
+    <div class="rounded-lg bg-sabbia p-8 text-center sm:p-12">
+      <h2 class="text-2xl sm:text-3xl">Hai una domanda?</h2>
+      <p class="mx-auto mt-3 max-w-md leading-relaxed text-fumo">
+        Scrivimi pure: rispondo io, non un servizio clienti.
+      </p>
+      <div class="mt-7">
+        <BottoneWhatsApp messaggio="Ciao! Ho letto la tua storia e volevo chiederti una cosa." />
+      </div>
+    </div>
+  </section>
+</Base>

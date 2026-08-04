@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import CandelaCard from '../components/CandelaCard.astro';
+import BottoneWhatsApp from '../components/BottoneWhatsApp.astro';
+import { sito } from '../lib/sito';
+import copertinaHero from '../assets/candele/bergamotto-cedro.jpg';
+import fotoAtelier from '../assets/candele/atelier.jpg';
+
+const candele = await getCollection('candele');
+const inEvidenza = candele
+  .filter((c) => c.data.inEvidenza)
+  .sort((a, b) => a.data.ordine - b.data.ordine)
+  .slice(0, 3);
+
+// Se nessuna candela e' segnata come "in evidenza" mostriamo comunque le prime
+// tre: la home non deve mai restare vuota per una dimenticanza nel CMS.
+const vetrina = inEvidenza.length
+  ? inEvidenza
+  : candele.sort((a, b) => a.data.ordine - b.data.ordine).slice(0, 3);
+---
+
+<Base titolo={sito.nome}>
+  <section class="contenitore grid items-center gap-10 py-14 lg:grid-cols-2 lg:gap-16 lg:py-24">
+    <div>
+      <p class="occhiello">{sito.sottotitolo}</p>
+      <!-- Nessuna interruzione forzata: a 390px i <br /> spezzavano male.
+           Il testo si bilancia da solo entro la larghezza massima. -->
+      <h1 class="mt-5 max-w-lg text-4xl leading-[1.08] text-balance sm:text-5xl lg:text-6xl xl:text-7xl">
+        Una candela non dovrebbe profumare di finto.
+      </h1>
+      <p class="mt-6 max-w-md text-lg leading-relaxed text-fumo">
+        {sito.claim} Le colo io, una alla volta, e ogni lotto esce leggermente diverso dal precedente.
+      </p>
+      <div class="mt-9 flex flex-wrap gap-3">
+        <a
+          href="/candele/"
+          class="inline-flex items-center rounded-full bg-inchiostro px-7 py-3 text-sm font-medium text-crema transition-colors hover:bg-fiamma"
+        >
+          Guarda le candele
+        </a>
+        <BottoneWhatsApp
+          variante="contorno"
+          messaggio="Ciao! Vorrei qualche informazione sulle candele."
+          testo="Scrivimi"
+        />
+      </div>
+    </div>
+
+    <div class="relative">
+      <Image
+        src={copertinaHero}
+        alt="Candela artigianale accesa accanto a una finestra"
+        widths={[500, 800, 1100]}
+        sizes="(min-width: 1024px) 34rem, 92vw"
+        loading="eager"
+        fetchpriority="high"
+        class="aspect-4/5 w-full rounded-lg object-cover"
+      />
+    </div>
+  </section>
+
+  <section class="contenitore py-14">
+    <div class="flex flex-wrap items-end justify-between gap-4 border-b border-lino pb-5">
+      <h2 class="text-3xl sm:text-4xl">Le più richieste</h2>
+      <a href="/candele/" class="text-sm text-fumo underline underline-offset-4 transition-colors hover:text-fiamma">
+        Tutte le candele
+      </a>
+    </div>
+
+    <div class="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+      {vetrina.map((candela, i) => <CandelaCard candela={candela} priorita={i === 0} />)}
+    </div>
+  </section>
+
+  <section class="contenitore grid items-center gap-10 py-14 lg:grid-cols-2 lg:gap-16">
+    <Image
+      src={fotoAtelier}
+      alt="Il piano di lavoro dove vengono colate le candele"
+      widths={[500, 800, 1100]}
+      sizes="(min-width: 1024px) 34rem, 92vw"
+      class="aspect-3/2 w-full rounded-lg object-cover"
+    />
+    <div>
+      <p class="occhiello">Come nascono</p>
+      <h2 class="mt-4 text-3xl sm:text-4xl">Piccoli lotti, in cucina</h2>
+      <p class="mt-5 leading-relaxed text-fumo">
+        Niente stampi industriali e niente produzione in serie. Ogni lotto è di poche decine di pezzi,
+        colato a mano e lasciato riposare 48 ore prima di essere accesa la prima volta per il controllo.
+      </p>
+      <p class="mt-4 leading-relaxed text-fumo">
+        Uso cera di soia al 100%, senza paraffina, e stoppini in cotone non sbiancato. Se una candela
+        non brucia in modo pulito durante il controllo, quel pezzo non viene venduto.
+      </p>
+      <a
+        href="/storia/"
+        class="mt-7 inline-block text-sm underline underline-offset-4 transition-colors hover:text-fiamma"
+      >
+        Leggi la storia completa
+      </a>
+    </div>
+  </section>
+</Base>
