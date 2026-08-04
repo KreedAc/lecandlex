@@ -14,19 +14,26 @@
    all'identita visiva reale. Nient'altro nel progetto contiene un colore
    scritto a mano: cambia qui e cambia ovunque.
 
-   I valori attuali sono un segnaposto caldo e neutro, scelti per non
-   litigare con nessuna palette. Tutte le combinazioni testo/sfondo qui
-   sotto superano il contrasto WCAG AA.
+   I valori marcati (Canva) sono stati recuperati dall'export del catalogo
+   esistente. Gli altri sono derivati o scelti per rispettare il contrasto:
+   i colori originali corrispondenti erano troppo chiari per essere usati
+   come testo. Tutte le combinazioni testo/sfondo superano il WCAG AA — il
+   rapporto verificato e' annotato accanto a ciascuna.
 --------------------------------------------------------------------------- */
 @theme {
-  --color-crema: #faf7f2; /* sfondo pagina */
-  --color-sabbia: #f0e9df; /* superfici e card */
-  --color-lino: #e2d8ca; /* bordi e separatori */
-  --color-inchiostro: #241e1a; /* testo principale */
-  --color-fumo: #675d55; /* testo secondario  — 5.4:1 su crema */
-  --color-fiamma: #a2551f; /* accento           — 5.4:1 con bianco */
-  --color-fiamma-scuro: #82430f; /* accento in hover */
-  --color-salvia: #6f7d64; /* accento secondario */
+  --color-crema: #fffaf6; /* sfondo pagina — derivato da "arancione chiaro" */
+  --color-sabbia: #f6ece6; /* superfici e card  — derivato */
+  --color-lino: #d8d1cb; /* bordi e separatori — Canva */
+  --color-inchiostro: #33241b; /* testo principale   — Canva, 14.4:1 su crema */
+  /* L'originale #8d7a6c si fermava a 3.9:1: inutilizzabile come testo. */
+  --color-fumo: #6b5a4d; /* testo secondario   — scurito, 6.3:1 su crema */
+  --color-fiamma: #af4c0f; /* accento            — Canva, 5.2:1 con bianco */
+  --color-fiamma-scuro: #8d3c0b; /* accento in hover */
+  /* Non e' nella palette originale: serve a distinguere "disponibile" da
+     "esaurito" con un colore e non solo con le parole. Il verde salvia
+     classico si fermava a 4.2:1 su crema e 3.8:1 su sabbia — scurito
+     perche' finisce su testo piccolo. */
+  --color-salvia: #5c6952; /* stato disponibile  — 5.6:1 su crema */
 
   --font-display: 'Cormorant Garamond', ui-serif, Georgia, serif;
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
