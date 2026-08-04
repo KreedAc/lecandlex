@@ -76,13 +76,23 @@ dell'originale. Vanno sostituite con le foto sorgente appena disponibili.
    - **Framework preset**: Astro
    - **Build command**: `npm run build`
    - **Output directory**: `dist`
-3. Variabile d'ambiente: `SITE_URL` con il dominio definitivo
-   (es. `https://lecandlex.it`). Serve a sitemap, canonical e anteprime social.
+3. Variabile d'ambiente: `SITE_URL` con l'indirizzo del sito.
 
-Ogni push su `main` ridistribuisce il sito automaticamente.
+Ogni push sul branch di produzione ridistribuisce il sito automaticamente.
 
-Dopo aver collegato un dominio personalizzato, aggiorna l'URL della sitemap in
-`public/robots.txt`.
+### Passare dal dominio provvisorio a quello definitivo
+
+Si parte con il `.pages.dev` gratuito e si collega il dominio comprato quando
+si vuole, senza rifare niente. Al momento del passaggio:
+
+1. Cloudflare Pages → *Custom domains* → aggiungi il dominio
+2. Cambia la variabile `SITE_URL` con il nuovo indirizzo e rilancia il deploy
+3. Aggiorna `ALLOWED_DOMAINS` nel Worker OAuth, altrimenti il pannello
+   `/admin` smette di far entrare
+
+Il dominio vive solo in `SITE_URL`: sitemap, canonical, anteprime social e
+`robots.txt` lo seguono da soli. L'unica eccezione è `site_url` in
+`public/admin/config.yml`, che serve al link "vedi il sito" dentro il pannello.
 
 ## Attivare il CMS
 

@@ -3,8 +3,14 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 
-// Cambia questo con il dominio definitivo prima del deploy in produzione.
-// Serve a sitemap, canonical URL e Open Graph.
+// L'unico posto in cui vive il dominio. Serve a sitemap, canonical URL,
+// anteprime social e robots.txt.
+//
+// Il valore qui sotto e' solo il ripiego per lo sviluppo in locale: in
+// produzione si imposta SITE_URL nelle variabili d'ambiente di Cloudflare
+// Pages. Quando si passa dal dominio provvisorio .pages.dev a quello
+// definitivo basta cambiare quella variabile e rilanciare il deploy —
+// nessun file da toccare.
 const site = process.env.SITE_URL ?? 'https://lecandlex.pages.dev';
 
 export default defineConfig({

@@ -16,6 +16,9 @@ backend:
 
 locale: it
 publish_mode: simple
+# Serve solo al link "vedi il sito" dentro il pannello. Se cambi dominio e
+# ti dimentichi di aggiornarlo qui, quel link porta al vecchio indirizzo:
+# nient'altro si rompe.
 site_url: https://lecandlex.pages.dev
 
 media_folder: src/assets/prodotti
