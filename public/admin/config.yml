@@ -8,9 +8,11 @@
 backend:
   name: github
   repo: KreedAc/lecandlex
+  # ATTENZIONE: questo branch deve essere lo stesso da cui Cloudflare Pages
+  # costruisce il sito. Se non coincidono, le modifiche fatte dal pannello
+  # vengono salvate su un branch che nessuno pubblica: sembrano sparite.
   branch: main
-  # Worker OAuth su Cloudflare: vedi GUIDA.md.
-  base_url: https://CAMBIAMI.workers.dev
+  base_url: https://lecandlex.giovanniavignone.workers.dev
 
 locale: it
 publish_mode: simple
