@@ -39,19 +39,35 @@ export function prezzo(valore: number): string {
   }).format(valore);
 }
 
-type ConPrezzo = { prezzo?: number; varianti: { prezzo: number }[] };
+type ConPrezzo = { prezzo?: number; varianti: { prezzo?: number }[] };
 
 /**
  * Molti articoli esistono in piu' taglie. In griglia non ha senso stampare
  * tutti i prezzi: mostriamo "da 3 €" e i dettagli restano nella scheda.
+ *
+ * Se il prezzo manca del tutto non mostriamo "0 €" — che sarebbe un errore
+ * visibile al cliente — ma un'indicazione che invita comunque a scrivere.
  */
 export function prezzoEsposto(p: ConPrezzo): string {
-  if (p.varianti.length > 0) {
-    const minimo = Math.min(...p.varianti.map((v) => v.prezzo));
+  const daVarianti = p.varianti
+    .map((v) => v.prezzo)
+    .filter((v): v is number => typeof v === 'number');
+
+  if (daVarianti.length > 0) {
+    const minimo = Math.min(...daVarianti);
     // Con una taglia sola non serve il "da": e' semplicemente il prezzo.
-    return p.varianti.length === 1 ? prezzo(minimo) : `da ${prezzo(minimo)}`;
+    return daVarianti.length === 1 ? prezzo(minimo) : `da ${prezzo(minimo)}`;
   }
-  return prezzo(p.prezzo ?? 0);
+  if (typeof p.prezzo === 'number') return prezzo(p.prezzo);
+  return 'Prezzo su richiesta';
+}
+
+/** Il prezzo piu' basso, per i dati strutturati. Undefined se non c'e'. */
+export function prezzoMinimo(p: ConPrezzo): number | undefined {
+  const tutti = [p.prezzo, ...p.varianti.map((v) => v.prezzo)].filter(
+    (v): v is number => typeof v === 'number'
+  );
+  return tutti.length > 0 ? Math.min(...tutti) : undefined;
 }
 
 export const etichettaMateriale: Record<string, string> = {

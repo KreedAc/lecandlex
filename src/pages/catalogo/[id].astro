@@ -4,10 +4,12 @@ import { getCollection, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import BottoneWhatsApp from '../../components/BottoneWhatsApp.astro';
 import ProdottoCard from '../../components/ProdottoCard.astro';
+import segnaposto from '../../assets/segnaposto.jpg';
 import {
   sito,
   prezzo,
   prezzoEsposto,
+  prezzoMinimo,
   messaggioProdotto,
   etichettaMateriale,
 } from '../../lib/sito';
@@ -25,12 +27,22 @@ const { prodotto } = Astro.props;
 const d = prodotto.data;
 const { Content } = await render(prodotto);
 
-const collezione = (await getCollection('collezioni')).find((c) => c.id === d.collezione.id);
+const collezione = d.collezione
+  ? (await getCollection('collezioni')).find((c) => c.id === d.collezione!.id)
+  : undefined;
 
-const altri = (await getCollection('prodotti'))
-  .filter((p) => p.id !== prodotto.id && p.data.collezione.id === d.collezione.id)
-  .sort((a, b) => a.data.ordine - b.data.ordine)
-  .slice(0, 4);
+// Solo se il prodotto ha una collezione: altrimenti mostrerebbe accostamenti
+// casuali tra articoli che non c'entrano niente.
+const altri = d.collezione
+  ? (await getCollection('prodotti'))
+      .filter((p) => p.id !== prodotto.id && p.data.collezione?.id === d.collezione!.id)
+      .sort((a, b) => a.data.ordine - b.data.ordine)
+      .slice(0, 4)
+  : [];
+
+const foto = d.copertina ?? segnaposto;
+const descrizioneFoto = d.altCopertina ?? d.nome;
+const galleria = d.galleria.filter((g) => g.file);
 
 const scheda = [
   ['Materiale', etichettaMateriale[d.materiale]],
@@ -40,24 +52,30 @@ const scheda = [
   d.personalizzabile ? ['Personalizzazione', 'Colori e composizione su richiesta'] : null,
 ].filter((r): r is [string, string] => r !== null);
 
+const minimo = prezzoMinimo(d);
+
 const datiStrutturati = {
   '@context': 'https://schema.org',
   '@type': 'Product',
   name: d.nome,
-  description: d.estratto ?? `${d.nome} — ${collezione?.data.nome ?? 'Le CandLex'}`,
-  image: new URL(d.copertina.src, Astro.site).href,
+  description: d.estratto ?? `${d.nome} — ${collezione?.data.nome ?? sito.nome}`,
+  image: new URL(foto.src, Astro.site).href,
   brand: { '@type': 'Brand', name: sito.nome },
-  offers: {
-    '@type': 'Offer',
-    price: d.prezzo ?? Math.min(...d.varianti.map((v) => v.prezzo)),
-    priceCurrency: 'EUR',
-    availability: d.disponibile ? 'https://schema.org/InStock' : 'https://schema.org/BackOrder',
-    url: new URL(Astro.url.pathname, Astro.site).href,
-  },
+  // Senza prezzo non dichiariamo un'offerta: meglio nessun dato che un
+  // prezzo sbagliato nei risultati di ricerca.
+  ...(minimo !== undefined && {
+    offers: {
+      '@type': 'Offer',
+      price: minimo,
+      priceCurrency: 'EUR',
+      availability: d.disponibile ? 'https://schema.org/InStock' : 'https://schema.org/BackOrder',
+      url: new URL(Astro.url.pathname, Astro.site).href,
+    },
+  }),
 };
 ---
 
-<Base titolo={d.nome} descrizione={d.estratto} immagine={d.copertina.src}>
+<Base titolo={d.nome} descrizione={d.estratto} immagine={foto.src}>
   <div class="contenitore py-8">
     <nav aria-label="Percorso" class="text-sm text-fumo">
       <a href="/catalogo/" class="underline underline-offset-4 transition-colors hover:text-fiamma">
@@ -71,8 +89,8 @@ const datiStrutturati = {
   <article class="contenitore grid gap-10 pb-14 lg:grid-cols-2 lg:gap-16">
     <div class="space-y-4">
       <Image
-        src={d.copertina}
-        alt={d.altCopertina}
+        src={foto}
+        alt={descrizioneFoto}
         widths={[500, 800, 1200]}
         sizes="(min-width: 1024px) 34rem, 92vw"
         loading="eager"
@@ -80,10 +98,10 @@ const datiStrutturati = {
         class="w-full rounded-lg bg-sabbia object-cover"
       />
       {
-        d.galleria.map((foto) => (
+        galleria.map((f) => (
           <Image
-            src={foto.file}
-            alt={foto.alt}
+            src={f.file!}
+            alt={f.alt ?? d.nome}
             widths={[500, 800, 1200]}
             sizes="(min-width: 1024px) 34rem, 92vw"
             loading="lazy"
@@ -133,7 +151,9 @@ const datiStrutturati = {
                       .filter(Boolean)
                       .join(' · ')}
                   </span>
-                  <span class="font-medium">{prezzo(v.prezzo)}</span>
+                  <span class="font-medium">
+                    {v.prezzo !== undefined ? prezzo(v.prezzo) : 'su richiesta'}
+                  </span>
                 </li>
               ))}
             </ul>

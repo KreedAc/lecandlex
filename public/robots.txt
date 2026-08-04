@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+Disallow: /guida/
 
 Sitemap: https://lecandlex.pages.dev/sitemap-index.xml

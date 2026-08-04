@@ -9,7 +9,13 @@ const site = process.env.SITE_URL ?? 'https://lecandlex.pages.dev';
 
 export default defineConfig({
   site,
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      // Le pagine di servizio hanno gia' il noindex: tenerle anche in
+      // sitemap sarebbe un segnale contraddittorio per i motori.
+      filter: (pagina) => !pagina.includes('/guida'),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

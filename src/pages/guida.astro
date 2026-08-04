@@ -1,0 +1,199 @@
+---
+import Base from '../layouts/Base.astro';
+import { sito } from '../lib/sito';
+
+// Pagina di servizio per chi aggiorna il sito. Non e' nel menu e non va
+// indicizzata, ma resta sempre raggiungibile da /guida: un link salvato
+// nei preferiti puo' perdersi, un indirizzo prevedibile no.
+const passi = [
+  {
+    testo: '**Premi «Nuovo Prodotto»** in alto a destra nella sezione Prodotti.',
+    nota: null,
+  },
+  {
+    testo: '**Scrivi il nome** e scegli la Collezione.',
+    nota: 'Se non sai in quale metterlo, lascialo vuoto: finisce in fondo al catalogo sotto «Altri prodotti», e lo sistemi con calma.',
+  },
+  {
+    testo: '**Metti il prezzo** e carica la Foto.',
+    nota: 'Se il pezzo esiste in più misure con prezzi diversi, lascia vuoto il prezzo e usa invece «Misure diverse» più in basso.',
+  },
+  {
+    testo: '**Compila peso e misure**, se li hai. Le misure si scrivono base per altezza: 6x8 cm.',
+    nota: null,
+  },
+  { testo: '**Premi «Pubblica».** Fatto.', nota: null },
+];
+
+const seSbagli = [
+  ['Prodotto senza foto', 'compare un riquadro «foto in arrivo»'],
+  ['Prodotto senza prezzo', 'compare «Prezzo su richiesta»'],
+  ['Prodotto senza collezione', 'finisce sotto «Altri prodotti»'],
+  ['Collezione cancellata', 'i suoi pezzi non spariscono, si spostano lì sotto'],
+];
+
+const grassetto = (t: string) => t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+---
+
+<Base
+  titolo="Guida per aggiornare il sito"
+  descrizione="Guida pratica per aggiornare il catalogo Le CandLex dal pannello di gestione."
+  noindex
+>
+  <section class="contenitore max-w-2xl py-12 lg:py-16">
+    <p class="occhiello">Solo per chi aggiorna il sito</p>
+    <h1 class="mt-4 text-4xl leading-tight sm:text-5xl">Come si aggiorna il sito</h1>
+    <p class="mt-5 text-lg leading-relaxed text-fumo">
+      Non serve saper programmare: tutto si fa da una pagina, anche dal telefono.
+    </p>
+
+    <h2 class="mt-12 text-2xl">Come si entra</h2>
+    <p class="mt-3 leading-relaxed text-fumo">
+      Aggiungi <code class="rounded bg-sabbia px-1.5 py-0.5 text-sm">/admin</code> alla fine
+      dell'indirizzo del sito. Ti chiede di entrare con GitHub, l'account che serve a salvare le
+      modifiche. Salvalo tra i preferiti la prima volta.
+    </p>
+
+    <div class="mt-7 rounded-lg bg-sabbia p-6">
+      <p class="occhiello">La cosa più importante da sapere</p>
+      <p class="mt-3 leading-relaxed text-fumo">
+        Ogni volta che premi <strong class="text-inchiostro">Pubblica</strong>, il sito si riscrive
+        da solo. Non è immediato:
+        <strong class="text-inchiostro">aspetta due o tre minuti</strong> e poi ricarica la pagina.
+        Se non vedi subito la modifica non hai sbagliato niente.
+      </p>
+    </div>
+
+    <h2 class="mt-12 text-2xl">Le tre cose che farai più spesso</h2>
+
+    <h3 class="mt-7 text-lg font-medium">Cambiare un prezzo</h3>
+    <p class="mt-2 leading-relaxed text-fumo">
+      Prodotti → cerchi il pezzo → cambi il numero in «Prezzo in euro» → Pubblica. Solo il numero,
+      senza il simbolo €.
+    </p>
+
+    <h3 class="mt-6 text-lg font-medium">Segnare che un pezzo è finito</h3>
+    <p class="mt-2 leading-relaxed text-fumo">
+      Apri il prodotto e spegni «Disponibile». Non lo fa sparire, ed è voluto: la scheda resta
+      online e mostra «In preparazione», e il bottone diventa «Chiedi disponibilità». Così chi lo
+      cercava ti scrive lo stesso e sai quanti ne rifare.
+    </p>
+
+    <h3 class="mt-6 text-lg font-medium">Cambiare una foto</h3>
+    <p class="mt-2 leading-relaxed text-fumo">
+      Apri il prodotto, premi sulla foto e ne carichi una nuova. Puoi scattarla al momento con il
+      telefono.
+    </p>
+
+    <h2 class="mt-12 text-2xl">Aggiungere un prodotto nuovo</h2>
+    <ol class="mt-6 space-y-5">
+      {
+        passi.map((passo, i) => (
+          <li class="flex gap-4">
+            <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-fiamma text-xs font-bold text-crema">
+              {i + 1}
+            </span>
+            <div>
+              <p class="leading-relaxed" set:html={grassetto(passo.testo)} />
+              {passo.nota && <p class="mt-1 text-sm leading-relaxed text-fumo">{passo.nota}</p>}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="mt-9 rounded-lg bg-sabbia p-6">
+      <p class="occhiello">Due interruttori che valgono soldi</p>
+      <p class="mt-3 leading-relaxed text-fumo">
+        <strong class="text-inchiostro">Stampo esclusivo</strong> — accendilo per i pezzi il cui
+        stampo hai creato tu. Compare una targhetta sulla foto. È l'unica cosa che nessun
+        concorrente può copiare.
+      </p>
+      <p class="mt-3 leading-relaxed text-fumo">
+        <strong class="text-inchiostro">Mostra in prima pagina</strong> — ne bastano quattro accesi.
+        Cambiali quando cambia la stagione.
+      </p>
+    </div>
+
+    <h2 class="mt-12 text-2xl">Le foto, che contano più di tutto</h2>
+    <ul class="mt-4 space-y-2 leading-relaxed text-fumo">
+      <li class="flex gap-3">
+        <span class="text-fiamma" aria-hidden="true">•</span>
+        <span><strong class="text-inchiostro">Luce di finestra</strong>, mai flash.</span>
+      </li>
+      <li class="flex gap-3">
+        <span class="text-fiamma" aria-hidden="true">•</span>
+        <span>
+          <strong class="text-inchiostro">Sfondo sempre uguale</strong> per tutti i pezzi di una collezione.
+        </span>
+      </li>
+      <li class="flex gap-3">
+        <span class="text-fiamma" aria-hidden="true">•</span>
+        <span>
+          <strong class="text-inchiostro">Inquadratura quadrata</strong>, oggetto al centro.
+        </span>
+      </li>
+      <li class="flex gap-3">
+        <span class="text-fiamma" aria-hidden="true">•</span>
+        <span>
+          <strong class="text-inchiostro">Una accesa al buio</strong> per ogni candela. È lo scatto che fa comprare.
+        </span>
+      </li>
+    </ul>
+    <p class="mt-4 text-sm leading-relaxed text-fumo">
+      Non serve comprimerle: caricale come sono, ci pensa il sito a renderle leggere.
+    </p>
+
+    <h2 class="mt-12 text-2xl">Se sbagli qualcosa</h2>
+    <p class="mt-3 leading-relaxed text-fumo">
+      Il sito è fatto apposta per non rompersi. Se lasci un campo vuoto:
+    </p>
+    <dl class="mt-5 divide-y divide-lino border-t border-lino">
+      {
+        seSbagli.map(([caso, esito]) => (
+          <div class="flex flex-wrap gap-x-4 gap-y-1 py-3 text-sm">
+            <dt class="w-56 shrink-0 font-medium">{caso}</dt>
+            <dd class="text-fumo">{esito}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    <p class="mt-5 leading-relaxed text-fumo">
+      Non c'è nessun campo che, lasciato vuoto, possa mandare offline il sito. Al massimo una scheda
+      viene un po' spoglia.
+    </p>
+
+    <h2 class="mt-12 text-2xl">Da fare una volta sola</h2>
+    <p class="mt-3 leading-relaxed text-fumo">In Impostazioni → Contatti e frasi del sito:</p>
+    <ul class="mt-4 space-y-3 leading-relaxed text-fumo">
+      <li class="flex gap-3">
+        <span class="text-fiamma" aria-hidden="true">•</span>
+        <span>
+          <strong class="text-inchiostro">Le spedizioni.</strong> Adesso c'è scritto «DA CONFERMARE».
+          Metti costo, da quanto è gratis e in quanti giorni arriva. Senza questi tre dati la gente
+          esita a ordinare.
+        </span>
+      </li>
+      <li class="flex gap-3">
+        <span class="text-fiamma" aria-hidden="true">•</span>
+        <span>
+          <strong class="text-inchiostro">Il nome Instagram.</strong> Controlla che sia identico al
+          tuo profilo, underscore compresi. Ora c'è scritto <code
+            class="rounded bg-sabbia px-1.5 py-0.5 text-sm">{sito.instagram}</code
+          >.
+        </span>
+      </li>
+      <li class="flex gap-3">
+        <span class="text-fiamma" aria-hidden="true">•</span>
+        <span>
+          <strong class="text-inchiostro">Le fragranze.</strong> Sono già le diciotto del catalogo.
+          Aggiornale quando cambi fornitore.
+        </span>
+      </li>
+    </ul>
+
+    <p class="mt-14 border-t border-lino pt-8 text-center font-display text-xl text-fumo">
+      {sito.claim}
+    </p>
+  </section>
+</Base>

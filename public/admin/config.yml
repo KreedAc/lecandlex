@@ -1,17 +1,21 @@
+# Le etichette e i suggerimenti di questo file sono quelli che Alessia legge
+# nel pannello. Sono scritti per chi non ha mai usato un CMS: niente termini
+# tecnici, esempi concreti, e i campi obbligatori sono il minimo indispensabile.
+#
+# La severita' sta qui, non nella build: se un campo manca il sito si
+# pubblica lo stesso (vedi src/content.config.ts).
+
 backend:
   name: github
   repo: KreedAc/lecandlex
   branch: main
-  # Worker OAuth su Cloudflare: vedi README, sezione "Attivare il CMS".
+  # Worker OAuth su Cloudflare: vedi GUIDA.md.
   base_url: https://CAMBIAMI.workers.dev
 
 locale: it
 publish_mode: simple
 site_url: https://lecandlex.pages.dev
 
-# Le foto vengono salvate in src/assets/ e non in public/, cosi' Astro le
-# ottimizza in AVIF/WebP. public_folder e' un percorso relativo al file .md
-# perche' e' cosi' che Astro risolve le immagini nelle content collections.
 media_folder: src/assets/prodotti
 public_folder: ../../assets/prodotti
 
@@ -19,14 +23,22 @@ collections:
   - name: prodotti
     label: Prodotti
     label_singular: Prodotto
+    description: >-
+      Tutto quello che vendi. Per aggiungere qualcosa premi "Nuovo Prodotto",
+      compila almeno nome, collezione, prezzo e foto, poi premi Pubblica.
     folder: src/content/prodotti
     create: true
     slug: '{{slug}}'
     identifier_field: nome
     summary: '{{nome}}'
     sortable_fields: [ordine, nome, prezzo]
+    view_groups:
+      - { label: Per collezione, field: collezione }
     fields:
-      - { name: nome, label: Nome, widget: string }
+      - name: nome
+        label: Nome
+        widget: string
+        hint: Come lo chiami tu. Esempio - Gufo Curioso
 
       - name: collezione
         label: Collezione
@@ -35,6 +47,8 @@ collections:
         search_fields: [nome]
         value_field: '{{slug}}'
         display_fields: [nome]
+        required: false
+        hint: Se la lasci vuota il prodotto finisce in fondo al catalogo, sotto "Altri prodotti".
 
       - name: prezzo
         label: Prezzo in euro
@@ -42,38 +56,37 @@ collections:
         value_type: float
         min: 0
         required: false
-        hint: Solo il numero, senza €. Lascialo vuoto se il prodotto ha più formati.
-
-      - name: varianti
-        label: Formati (se ce n'è più di uno)
-        widget: list
-        required: false
-        label_singular: Formato
-        hint: Usa questo solo per articoli che esistono in più taglie, tipo L e S.
-        fields:
-          - { name: nome, label: Nome del formato, widget: string, hint: 'Esempio - Grande, Piccolo, Max' }
-          - { name: prezzo, label: Prezzo in euro, widget: number, value_type: float, min: 0 }
-          - { name: pesoGrammi, label: Peso in grammi, widget: number, value_type: int, required: false }
-          - { name: dimensioni, label: Dimensioni, widget: string, required: false }
+        hint: Solo il numero, senza il simbolo €. Se l'articolo esiste in più misure lascialo vuoto e usa "Misure diverse" qui sotto.
 
       - name: copertina
-        label: Foto principale
+        label: Foto
         widget: image
-        hint: È la foto che si vede nel catalogo.
+        required: false
+        hint: La foto principale, quella che si vede nel catalogo. Se la lasci vuota compare un riquadro "foto in arrivo".
 
       - name: altCopertina
-        label: Descrizione della foto
+        label: Cosa si vede nella foto
         widget: string
-        hint: Serve a chi non vede le immagini e a Google. Esempio - "Candela a forma di gufo, color panna, su un tronchetto di legno".
-
-      - name: galleria
-        label: Altre foto
-        widget: list
         required: false
-        label_singular: Foto
-        fields:
-          - { name: file, label: Foto, widget: image }
-          - { name: alt, label: Descrizione della foto, widget: string }
+        hint: Una frase breve per chi non può vedere le immagini, e per Google. Esempio - Candela a forma di gufo, color panna, su un tronchetto di legno.
+
+      - name: disponibile
+        label: Disponibile
+        widget: boolean
+        default: true
+        hint: Spegnilo quando finisci un lotto. La scheda resta online e mostra "In preparazione", così chi lo cerca ti scrive lo stesso.
+
+      - name: pesoGrammi
+        label: Peso in grammi
+        widget: number
+        value_type: int
+        required: false
+
+      - name: dimensioni
+        label: Misure
+        widget: string
+        required: false
+        hint: Base per altezza, come sul catalogo. Esempio - 6x8 cm
 
       - name: materiale
         label: Materiale
@@ -87,19 +100,46 @@ collections:
           - { label: Vetro, value: vetro }
           - { label: Materiali misti, value: misto }
 
-      - { name: pesoGrammi, label: Peso in grammi, widget: number, value_type: int, required: false }
-
-      - name: dimensioni
-        label: Dimensioni
-        widget: string
-        required: false
-        hint: Base x altezza, come nel catalogo. Esempio - 6x8 cm
-
       - name: stampoEsclusivo
         label: Stampo esclusivo
         widget: boolean
         default: false
-        hint: Accendilo se lo stampo l'hai creato tu. Compare come badge sul prodotto.
+        hint: Accendilo se lo stampo l'hai creato tu. Compare una targhetta sul prodotto - è il tuo punto di forza, usalo.
+
+      - name: inEvidenza
+        label: Mostra in prima pagina
+        widget: boolean
+        default: false
+        hint: Ne bastano quattro. Se ne accendi di più, in home compaiono i primi quattro per ordine.
+
+      - name: estratto
+        label: Frase breve
+        widget: string
+        required: false
+        hint: Una riga sola sotto il nome. Serve a far venire voglia, non a descrivere. Puoi lasciarla vuota.
+
+      - name: varianti
+        label: Misure diverse
+        widget: list
+        required: false
+        collapsed: true
+        label_singular: Misura
+        hint: Solo per articoli che esistono in più taglie con prezzi diversi. Altrimenti lascia stare e usa il campo Prezzo.
+        fields:
+          - { name: nome, label: Come si chiama, widget: string, hint: 'Esempio - Grande, Piccolo, Max' }
+          - { name: prezzo, label: Prezzo in euro, widget: number, value_type: float, min: 0, required: false }
+          - { name: pesoGrammi, label: Peso in grammi, widget: number, value_type: int, required: false }
+          - { name: dimensioni, label: Misure, widget: string, required: false }
+
+      - name: galleria
+        label: Altre foto
+        widget: list
+        required: false
+        collapsed: true
+        label_singular: Foto
+        fields:
+          - { name: file, label: Foto, widget: image, required: false }
+          - { name: alt, label: Cosa si vede nella foto, widget: string, required: false }
 
       - name: personalizzabile
         label: Personalizzabile nei colori
@@ -110,76 +150,90 @@ collections:
         label: Si può profumare
         widget: boolean
         default: true
+        hint: Spegnilo per gli oggetti d'arredo che non sono candele.
 
-      - name: disponibile
-        label: Disponibile
-        widget: boolean
-        default: true
-        hint: Se lo spegni, la scheda resta online e mostra "In preparazione".
-
-      - { name: inEvidenza, label: Mostra in home, widget: boolean, default: false }
+      - name: nota
+        label: Nota
+        widget: string
+        required: false
+        hint: Vincoli o supplementi da segnalare. Esempio - disponibile solo in ceramica, piedistallo +1€
 
       - name: ordine
         label: Ordine
         widget: number
         value_type: int
         default: 100
-        hint: Numero più basso = compare prima.
+        hint: Numero più basso = compare prima. Se non sai cosa metterci, lascia 100.
 
-      - name: nota
-        label: Nota
-        widget: string
+      - name: paginaCatalogo
+        label: Pagina del catalogo Canva
+        widget: number
+        value_type: int
         required: false
-        hint: Vincoli o supplementi. Esempio - "disponibile solo in ceramica", "piedistallo +1€".
-
-      - name: estratto
-        label: Frase breve
-        widget: string
-        required: false
-        hint: Una riga sola, massimo 180 caratteri.
-        pattern: ['^.{0,180}$', 'Massimo 180 caratteri']
-
-      - { name: paginaCatalogo, label: Pagina del catalogo Canva, widget: number, value_type: int, required: false }
+        hint: Serve solo a te, per ritrovare i dati originali. Non compare sul sito.
 
       - name: body
         label: Descrizione
         widget: markdown
         required: false
+        hint: Raccontalo con parole tue - com'è nato, dove sta bene, a chi lo regaleresti. È la parte che vende.
 
   - name: collezioni
     label: Collezioni
     label_singular: Collezione
+    description: >-
+      I gruppi in cui è diviso il catalogo. Cancellarne una non fa sparire i
+      suoi prodotti - finiscono sotto "Altri prodotti" finché non li risistemi.
     folder: src/content/collezioni
     create: true
     slug: '{{slug}}'
     identifier_field: nome
     fields:
       - { name: nome, label: Nome, widget: string }
-      - { name: descrizione, label: Descrizione, widget: text }
+      - name: descrizione
+        label: Descrizione
+        widget: text
+        required: false
+        hint: Due righe che spiegano cosa accomuna questi pezzi.
       - { name: copertina, label: Foto di copertina, widget: image, required: false }
-      - { name: altCopertina, label: Descrizione della foto, widget: string, required: false }
-      - { name: ordine, label: Ordine, widget: number, value_type: int, default: 100 }
+      - { name: altCopertina, label: Cosa si vede nella foto, widget: string, required: false }
+      - name: ordine
+        label: Ordine
+        widget: number
+        value_type: int
+        default: 100
+        hint: Numero più basso = compare prima nel catalogo.
 
   - name: impostazioni
-    label: Impostazioni del sito
+    label: Impostazioni
+    description: I dati che compaiono ovunque sul sito - contatti, frasi, elenco fragranze.
     files:
       - name: sito
-        label: Dati generali e contatti
+        label: Contatti e frasi del sito
         file: src/data/sito.json
         fields:
           - { name: nome, label: Nome del marchio, widget: string }
-          - { name: sottotitolo, label: Sottotitolo, widget: string }
-          - { name: claim, label: Frase di presentazione, widget: string }
-          - { name: descrizione, label: Descrizione per Google, widget: text }
+          - { name: sottotitolo, label: Sottotitolo, widget: string, hint: 'Esempio - Candele | Arredo | Eventi' }
+          - name: claim
+            label: Frase principale
+            widget: string
+            hint: È il titolo grande della prima pagina. Deve stare in una riga o due.
+          - name: descrizione
+            label: Descrizione per Google
+            widget: text
+            hint: Il testo che appare sotto il titolo nei risultati di ricerca. Due righe, chiare.
           - { name: titolare, label: Nome e cognome, widget: string }
           - { name: email, label: Email, widget: string }
           - name: whatsapp
             label: Numero WhatsApp
             widget: string
-            hint: Formato internazionale senza + e senza spazi. Esempio - 393459190403
+            hint: Con il prefisso internazionale, senza + e senza spazi. Esempio - 393459190403
             pattern: ['^[0-9]{8,15}$', 'Solo cifre, senza + e senza spazi']
-          - { name: telefonoLeggibile, label: Telefono come si legge, widget: string }
-          - { name: instagram, label: Nome utente Instagram, widget: string, hint: Senza la chiocciola. }
+          - { name: telefonoLeggibile, label: Telefono come si scrive, widget: string, hint: 'Esempio - 345 91 90 403' }
+          - name: instagram
+            label: Nome utente Instagram
+            widget: string
+            hint: Senza la chiocciola. Attenzione agli underscore - controlla che sia identico al tuo profilo.
           - { name: facebook, label: Pagina Facebook, widget: string }
           - { name: citta, label: Città o zona, widget: string }
           - { name: omaggioDa, label: Omaggio a partire da (euro), widget: number, value_type: int }
@@ -189,9 +243,9 @@ collections:
             label: Spedizioni
             widget: object
             fields:
-              - { name: costo, label: Costo, widget: string }
-              - { name: gratisDa, label: Gratis a partire da, widget: string }
-              - { name: tempi, label: Tempi di consegna, widget: string }
+              - { name: costo, label: Costo, widget: string, hint: 'Esempio - 5,90 €' }
+              - { name: gratisDa, label: Gratis a partire da, widget: string, hint: 'Esempio - 49 €' }
+              - { name: tempi, label: Tempi di consegna, widget: string, hint: 'Esempio - 2-4 giorni lavorativi' }
               - { name: ritiroInPersona, label: Ritiro di persona possibile, widget: boolean, default: true }
 
       - name: fragranze
@@ -201,4 +255,5 @@ collections:
           - name: fragranze
             label: Fragranze
             widget: list
+            hint: Compaiono nella pagina Cura. Aggiungine o toglietene quando cambi fornitore.
             field: { name: nome, label: Fragranza, widget: string }

@@ -9,9 +9,11 @@ interface Props {
   descrizione?: string;
   /** URL assoluto o path dell'immagine per l'anteprima social. */
   immagine?: string;
+  /** Per le pagine di servizio che non devono finire su Google. */
+  noindex?: boolean;
 }
 
-const { titolo, descrizione = sito.descrizione, immagine } = Astro.props;
+const { titolo, descrizione = sito.descrizione, immagine, noindex = false } = Astro.props;
 
 const titoloCompleto =
   titolo === sito.nome ? `${sito.nome} — ${sito.sottotitolo}` : `${titolo} — ${sito.nome}`;
@@ -26,6 +28,7 @@ const anteprima = immagine ? new URL(immagine, Astro.site).href : undefined;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{titoloCompleto}</title>
     <meta name="description" content={descrizione} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />

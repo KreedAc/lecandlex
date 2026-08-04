@@ -12,16 +12,21 @@ const gruppi = collezioni
   .map((collezione) => ({
     collezione,
     prodotti: prodotti
-      .filter((p) => p.data.collezione.id === collezione.id)
+      .filter((p) => p.data.collezione?.id === collezione.id)
       .sort((a, b) => a.data.ordine - b.data.ordine),
   }))
   .filter((g) => g.prodotti.length > 0);
 
 // Le collezioni gia' create ma ancora senza prodotti restano elencate:
 // servono a far vedere che il catalogo e' piu' ampio di quanto e' online.
-const inArrivo = collezioni.filter(
-  (c) => !prodotti.some((p) => p.data.collezione.id === c.id)
-);
+const inArrivo = collezioni.filter((c) => !prodotti.some((p) => p.data.collezione?.id === c.id));
+
+// Rete di sicurezza: un prodotto senza collezione, o che punta a una
+// collezione cancellata, resta comunque visibile invece di sparire.
+const idCollezioni = new Set(collezioni.map((c) => c.id));
+const orfani = prodotti
+  .filter((p) => !p.data.collezione || !idCollezioni.has(p.data.collezione.id))
+  .sort((a, b) => a.data.ordine - b.data.ordine);
 ---
 
 <Base
@@ -53,6 +58,19 @@ const inArrivo = collezioni.filter(
         </div>
       </section>
     ))
+  }
+
+  {
+    orfani.length > 0 && (
+      <section class="contenitore pb-14">
+        <h2 class="border-b border-lino pb-5 text-2xl sm:text-3xl">Altri prodotti</h2>
+        <div class="mt-8 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
+          {orfani.map((prodotto) => (
+            <ProdottoCard prodotto={prodotto} />
+          ))}
+        </div>
+      </section>
+    )
   }
 
   {

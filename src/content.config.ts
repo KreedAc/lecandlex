@@ -4,23 +4,23 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 /**
- * Il catalogo non e' fatto di candele profumate in barattolo: sono
- * soprattutto candele scultura e complementi d'arredo. Quindi niente note
- * olfattive per prodotto — le fragranze sono un elenco unico da cui il
- * cliente sceglie (src/data/fragranze.json) e valgono per tutto.
+ * SCHEMA PERMISSIVO — E' UNA SCELTA, NON UNA DIMENTICANZA
  *
- * Quello che identifica davvero un pezzo e': materiale, peso, ingombro.
+ * Questo sito viene aggiornato da chi non scrive codice e non ha nessuno
+ * a cui chiedere aiuto. Se un campo mancante facesse fallire la build, il
+ * sito smetterebbe di aggiornarsi senza che nessuno capisca perche'.
+ *
+ * Quindi: qui e' obbligatorio solo il nome. Tutto il resto ha un
+ * comportamento sensato quando manca (foto segnaposto, "prezzo su
+ * richiesta", prodotto raggruppato tra gli altri). La severita' sta nel
+ * form del CMS, dove l'errore si vede subito e si corregge, non nella
+ * build, dove l'errore e' invisibile e blocca tutto.
  */
 const materiali = ['cera', 'ceramica', 'jesmonite', 'resina', 'vetro', 'misto'] as const;
 
-/**
- * Molti articoli esistono in piu' taglie con prezzi diversi (Dolce Cuore
- * L/S, Bubble Cube Max/Med/Min). Quando c'e' una sola taglia si compila
- * `prezzo` sul prodotto e si lascia vuoto questo elenco.
- */
 const variante = z.object({
-  nome: z.string(),
-  prezzo: z.number(),
+  nome: z.string().default('Formato unico'),
+  prezzo: z.number().optional(),
   pesoGrammi: z.number().optional(),
   dimensioni: z.string().optional(),
 });
@@ -28,41 +28,43 @@ const variante = z.object({
 const prodotti = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/prodotti' }),
   schema: ({ image }) =>
-    z
-      .object({
-        nome: z.string(),
-        collezione: reference('collezioni'),
-        prezzo: z.number().optional(),
-        varianti: z.array(variante).default([]),
+    z.object({
+      nome: z.string(),
 
-        copertina: image(),
-        altCopertina: z.string(),
-        galleria: z.array(z.object({ file: image(), alt: z.string() })).default([]),
+      // Se la collezione viene rinominata o cancellata il prodotto non
+      // sparisce e non rompe niente: finisce in fondo al catalogo.
+      collezione: reference('collezioni').optional(),
 
-        materiale: z.enum(materiali).default('cera'),
-        pesoGrammi: z.number().optional(),
-        // Sempre "base x altezza", come dichiarato nel catalogo.
-        dimensioni: z.string().optional(),
+      prezzo: z.number().optional(),
+      varianti: z.array(variante).default([]),
 
-        // Badge del catalogo: lo stampo e' disegnato e realizzato da
-        // Le CandLex, non comprato. E' il pezzo di differenziazione piu'
-        // forte che ha e va mostrato.
-        stampoEsclusivo: z.boolean().default(false),
-        personalizzabile: z.boolean().default(false),
-        profumabile: z.boolean().default(true),
+      // Senza foto il prodotto mostra un segnaposto pulito.
+      copertina: image().optional(),
+      altCopertina: z.string().optional(),
+      galleria: z
+        .array(z.object({ file: image().optional(), alt: z.string().optional() }))
+        .default([]),
 
-        disponibile: z.boolean().default(true),
-        inEvidenza: z.boolean().default(false),
-        ordine: z.number().default(100),
-        // Vincoli e supplementi: "solo in ceramica", "piedistallo +1€".
-        nota: z.string().optional(),
-        estratto: z.string().max(180).optional(),
-        paginaCatalogo: z.number().optional(),
-      })
-      .refine((p) => p.prezzo !== undefined || p.varianti.length > 0, {
-        message: 'Serve un prezzo, oppure almeno una variante con un prezzo.',
-        path: ['prezzo'],
-      }),
+      materiale: z.enum(materiali).default('cera'),
+      pesoGrammi: z.number().optional(),
+      // Sempre "base x altezza", come dichiarato nel catalogo.
+      dimensioni: z.string().optional(),
+
+      // Badge del catalogo: lo stampo e' disegnato e realizzato da
+      // Le CandLex, non comprato.
+      stampoEsclusivo: z.boolean().default(false),
+      personalizzabile: z.boolean().default(false),
+      profumabile: z.boolean().default(true),
+
+      disponibile: z.boolean().default(true),
+      inEvidenza: z.boolean().default(false),
+      ordine: z.number().default(100),
+      nota: z.string().optional(),
+      // Nessun limite di lunghezza: un testo troppo lungo si tronca da
+      // solo con le CSS, non deve far fallire la pubblicazione.
+      estratto: z.string().optional(),
+      paginaCatalogo: z.number().optional(),
+    }),
 });
 
 const collezioni = defineCollection({
@@ -70,7 +72,7 @@ const collezioni = defineCollection({
   schema: ({ image }) =>
     z.object({
       nome: z.string(),
-      descrizione: z.string(),
+      descrizione: z.string().optional(),
       copertina: image().optional(),
       altCopertina: z.string().optional(),
       ordine: z.number().default(100),
