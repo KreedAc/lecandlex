@@ -1,11 +1,13 @@
 ---
-nome: "Natura"
+nome: Natura
 collezione: easter
 prezzo: 13
-materiale: cera
+copertina: /src/assets/prodotti/product-071.jpg
+altCopertina: ''
 pesoGrammi: 210
-dimensioni: "6,5x9 cm"
+dimensioni: 6,5x9 cm
+materiale: cera
+estratto: ''
 ordine: 680
 paginaCatalogo: 32
 ---
-
