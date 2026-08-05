@@ -21,6 +21,26 @@ const TOKEN = 'https://github.com/login/oauth/access_token';
 /** Cookie di stato: lega la richiesta di login alla risposta di GitHub. */
 const COOKIE = 'lecandlex_oauth_state';
 
+/**
+ * Un errore di configurazione lo legge chi sta sistemando il sito, non un
+ * cliente: tanto vale spiegargli dove mettere le mani invece di dirgli
+ * solo che manca qualcosa.
+ */
+function mancaVariabile(nome) {
+  return [
+    `Manca la variabile ${nome}.`,
+    '',
+    'Su Cloudflare: Workers & Pages -> lecandlex -> Settings ->',
+    'Variables and Secrets -> Add.',
+    '',
+    'Spunta "Encrypt" su entrambe le variabili: quelle in chiaro possono',
+    'essere azzerate dal prossimo deploy, quelle cifrate no.',
+    '',
+    'I valori si prendono dalla OAuth App su GitHub:',
+    'Settings -> Developer settings -> OAuth Apps.',
+  ].join('\n');
+}
+
 function testo(messaggio, stato = 400) {
   return new Response(messaggio, {
     status: stato,
@@ -83,7 +103,7 @@ function leggiCookie(request, nome) {
 
 async function avviaLogin(request, env, url) {
   if (!env.GITHUB_CLIENT_ID) {
-    return testo('Manca GITHUB_CLIENT_ID nelle variabili del Worker.', 500);
+    return testo(mancaVariabile('GITHUB_CLIENT_ID'), 500);
   }
 
   // Valore casuale che ritroveremo nella risposta di GitHub: se non
@@ -115,7 +135,7 @@ async function concludiLogin(request, env, url) {
     return testo('Sessione di accesso non valida. Riprova dal pannello.', 403);
   }
   if (!env.GITHUB_CLIENT_SECRET) {
-    return testo('Manca GITHUB_CLIENT_SECRET nelle variabili del Worker.', 500);
+    return testo(mancaVariabile('GITHUB_CLIENT_SECRET'), 500);
   }
 
   const risposta = await fetch(TOKEN, {
