@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Bottone from '../components/Bottone.astro';
 ---
 
 <Base titolo="Pagina non trovata" descrizione="La pagina cercata non esiste.">
@@ -9,11 +10,6 @@ import Base from '../layouts/Base.astro';
     <p class="mx-auto mt-5 max-w-md leading-relaxed text-fumo">
       Il link potrebbe essere vecchio, oppure la candela che cercavi ha cambiato nome.
     </p>
-    <a
-      href="/catalogo/"
-      class="mt-9 inline-flex items-center rounded-full bg-inchiostro px-7 py-3 text-sm font-medium text-crema transition-colors hover:bg-fiamma"
-    >
-      Vai al catalogo
-    </a>
+    <Bottone href="/catalogo/" class="mt-9">Vai al catalogo</Bottone>
   </section>
 </Base>

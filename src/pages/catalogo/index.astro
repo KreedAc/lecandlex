@@ -1,7 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import NavCollezioni from '../../components/NavCollezioni.astro';
 import ProdottoCard from '../../components/ProdottoCard.astro';
+import { prezzo } from '../../lib/sito';
 
 const prodotti = await getCollection('prodotti');
 const collezioni = (await getCollection('collezioni')).sort(
@@ -9,60 +11,108 @@ const collezioni = (await getCollection('collezioni')).sort(
 );
 
 const gruppi = collezioni
-  .map((collezione) => ({
-    collezione,
-    prodotti: prodotti
+  .map((collezione) => {
+    const suoi = prodotti
       .filter((p) => p.data.collezione?.id === collezione.id)
-      .sort((a, b) => a.data.ordine - b.data.ordine),
-  }))
-  .filter((g) => g.prodotti.length > 0);
+      .sort((a, b) => a.data.ordine - b.data.ordine);
 
-// Le collezioni gia' create ma ancora senza prodotti restano elencate:
-// servono a far vedere che il catalogo e' piu' ampio di quanto e' online.
-const inArrivo = collezioni.filter((c) => !prodotti.some((p) => p.data.collezione?.id === c.id));
+    // Il prezzo piu' basso della collezione: dice a colpo d'occhio se e'
+    // la sezione dei pensierini o quella dei pezzi importanti.
+    const prezziMinimi = suoi
+      .flatMap((p) => [p.data.prezzo, ...p.data.varianti.map((v) => v.prezzo)])
+      .filter((v): v is number => typeof v === 'number');
 
-// Rete di sicurezza: un prodotto senza collezione, o che punta a una
-// collezione cancellata, resta comunque visibile invece di sparire.
-const idCollezioni = new Set(collezioni.map((c) => c.id));
+    return {
+      collezione,
+      quanti: suoi.length,
+      da: prezziMinimi.length ? Math.min(...prezziMinimi) : undefined,
+      esclusivi: suoi.filter((p) => p.data.stampoEsclusivo).length,
+    };
+  })
+  .filter((g) => g.quanti > 0);
+
+const vuote = collezioni.filter((c) => !prodotti.some((p) => p.data.collezione?.id === c.id));
+
 const orfani = prodotti
-  .filter((p) => !p.data.collezione || !idCollezioni.has(p.data.collezione.id))
+  .filter((p) => !p.data.collezione)
   .sort((a, b) => a.data.ordine - b.data.ordine);
+
+const totaleEsclusivi = prodotti.filter((p) => p.data.stampoEsclusivo).length;
 ---
 
 <Base
   titolo="Catalogo"
-  descrizione="Candele scultura, candele profumate e complementi d'arredo in ceramica, divisi per collezione."
+  descrizione="Candele scultura e complementi d'arredo in ceramica, divisi per collezione."
 >
-  <section class="contenitore py-12 lg:py-16">
-    <p class="occhiello">Catalogo</p>
-    <h1 class="mt-4 text-4xl sm:text-5xl">Le collezioni</h1>
-    <p class="mt-5 max-w-xl leading-relaxed text-fumo">
-      Ogni scheda riporta peso e dimensioni reali. Le misure in centimetri corrispondono sempre a
-      base × altezza.
+  <NavCollezioni />
+
+  <section class="contenitore pt-10 pb-10 lg:pt-14">
+    <h1 class="text-4xl sm:text-5xl">Le collezioni</h1>
+    <p class="mt-5 max-w-xl text-lg leading-relaxed text-fumo">
+      {prodotti.length} pezzi divisi in {gruppi.length} collezioni, di cui {totaleEsclusivi} da stampi
+      creati qui e che non trovi altrove.
     </p>
   </section>
 
-  {
-    gruppi.map(({ collezione, prodotti: elenco }) => (
-      <section class="contenitore pb-14">
-        <div class="border-b border-lino pb-5">
-          <h2 class="text-2xl sm:text-3xl">{collezione.data.nome}</h2>
-          <p class="mt-2 max-w-xl text-sm leading-relaxed text-fumo">
-            {collezione.data.descrizione}
-          </p>
-        </div>
-        <div class="mt-8 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
-          {elenco.map((prodotto, i) => (
-            <ProdottoCard prodotto={prodotto} priorita={i < 4} />
-          ))}
-        </div>
-      </section>
-    ))
-  }
+  <!-- Ogni collezione e' una scheda: da qui si sceglie dove andare invece
+       di scorrere duecento prodotti in fila. -->
+  <section class="contenitore pb-16">
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        gruppi.map(({ collezione, quanti, da, esclusivi }) => (
+          <li>
+            <a
+              href={`/collezioni/${collezione.id}/`}
+              class="group flex h-full flex-col rounded-xl border border-lino bg-sabbia/50 p-6 transition-colors duration-200 hover:border-fiamma/40 hover:bg-sabbia"
+            >
+              <div class="flex items-baseline justify-between gap-3">
+                <h2 class="text-2xl leading-tight transition-colors group-hover:text-fiamma">
+                  {collezione.data.nome.replace(/^Collezione /, '')}
+                </h2>
+                <span class="shrink-0 text-sm text-fumo tabular-nums">{quanti}</span>
+              </div>
+
+              {esclusivi > 0 && (
+                <p class="mt-2 text-xs text-fumo">
+                  {esclusivi} {esclusivi === 1 ? 'pezzo' : 'pezzi'} a stampo esclusivo
+                </p>
+              )}
+
+              {collezione.data.descrizione && (
+                <p class="mt-3 flex-1 text-sm leading-relaxed text-fumo">
+                  {collezione.data.descrizione}
+                </p>
+              )}
+
+              <div class="mt-6 flex items-center justify-between gap-3 border-t border-lino pt-4 text-sm">
+                <span class="text-fumo">{da !== undefined ? `da ${prezzo(da)}` : ' '}</span>
+                <span class="flex items-center gap-1.5 text-inchiostro">
+                  Guarda
+                  <svg
+                    viewBox="0 0 16 16"
+                    width="14"
+                    height="14"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    aria-hidden="true"
+                    class="transition-transform duration-200 group-hover:translate-x-1"
+                  >
+                    <path d="M2 8h11M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round" />
+                  </svg>
+                </span>
+              </div>
+
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
 
   {
     orfani.length > 0 && (
-      <section class="contenitore pb-14">
+      <section class="contenitore pb-16">
         <h2 class="border-b border-lino pb-5 text-2xl sm:text-3xl">Altri prodotti</h2>
         <div class="mt-8 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
           {orfani.map((prodotto) => (
@@ -74,16 +124,16 @@ const orfani = prodotti
   }
 
   {
-    inArrivo.length > 0 && (
-      <section class="contenitore pb-14">
-        <div class="rounded-lg bg-sabbia p-8 sm:p-10">
+    vuote.length > 0 && (
+      <section class="contenitore pb-16">
+        <div class="rounded-xl bg-sabbia p-8 sm:p-10">
           <h2 class="text-2xl">Altre collezioni in arrivo online</h2>
           <p class="mt-3 max-w-2xl leading-relaxed text-fumo">
-            Queste collezioni esistono a catalogo ma non sono ancora state pubblicate qui. Se cerchi
-            qualcosa in particolare, scrivimi: te lo mando in foto.
+            Esistono a catalogo ma non sono ancora qui. Se cerchi qualcosa in particolare, scrivimi:
+            te lo mando in foto.
           </p>
           <ul class="mt-6 flex flex-wrap gap-2">
-            {inArrivo.map((c) => (
+            {vuote.map((c) => (
               <li class="rounded-full border border-lino bg-crema px-4 py-1.5 text-sm">
                 {c.data.nome}
               </li>

@@ -1,0 +1,53 @@
+---
+/**
+ * Il bottone del sito, in un posto solo.
+ *
+ * Prima ogni pagina si ricostruiva le sue classi a mano: bastava una svista
+ * per avere due bottoni leggermente diversi nella stessa schermata, ed e'
+ * il genere di dettaglio che fa sembrare un sito improvvisato.
+ */
+interface Props {
+  href: string;
+  variante?: 'primario' | 'fiamma' | 'contorno' | 'quieto';
+  dimensione?: 'normale' | 'grande';
+  esterno?: boolean;
+  class?: string;
+}
+
+const {
+  href,
+  variante = 'primario',
+  dimensione = 'normale',
+  esterno = false,
+  class: classe = '',
+} = Astro.props;
+
+const varianti = {
+  primario: 'bg-inchiostro text-crema hover:bg-fiamma',
+  fiamma: 'bg-fiamma text-crema hover:bg-fiamma-scuro',
+  contorno: 'border border-inchiostro/25 text-inchiostro hover:border-inchiostro hover:bg-inchiostro hover:text-crema',
+  quieto: 'bg-sabbia text-inchiostro hover:bg-lino',
+};
+
+const dimensioni = {
+  normale: 'px-6 py-3 text-sm',
+  grande: 'px-8 py-3.5 text-base',
+};
+---
+
+<a
+  href={href}
+  {...esterno ? { target: '_blank', rel: 'noopener' } : {}}
+  class:list={[
+    'group/bottone inline-flex items-center justify-center gap-2.5 rounded-full font-medium',
+    // La transizione tocca solo cio' che cambia davvero: `transition-all`
+    // farebbe animare anche proprieta' che non ci interessano.
+    'transition-[background-color,border-color,color,transform] duration-200',
+    'active:scale-[0.98]',
+    varianti[variante],
+    dimensioni[dimensione],
+    classe,
+  ]}
+>
+  <slot />
+</a>

@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import NavCollezioni from '../../components/NavCollezioni.astro';
+import ProdottoCard from '../../components/ProdottoCard.astro';
+import BottoneWhatsApp from '../../components/BottoneWhatsApp.astro';
+
+export async function getStaticPaths() {
+  const collezioni = await getCollection('collezioni');
+  const prodotti = await getCollection('prodotti');
+
+  return collezioni
+    .filter((c) => prodotti.some((p) => p.data.collezione?.id === c.id))
+    .map((collezione) => ({
+      params: { id: collezione.id },
+      props: { collezione },
+    }));
+}
+
+const { collezione } = Astro.props;
+
+const prodotti = (await getCollection('prodotti'))
+  .filter((p) => p.data.collezione?.id === collezione.id)
+  .sort((a, b) => a.data.ordine - b.data.ordine);
+
+const esclusivi = prodotti.filter((p) => p.data.stampoEsclusivo).length;
+const nome = collezione.data.nome.replace(/^Collezione /, '');
+---
+
+<Base titolo={collezione.data.nome} descrizione={collezione.data.descrizione}>
+  <NavCollezioni attiva={collezione.id} />
+
+  <section class="contenitore pt-10 pb-8 lg:pt-14">
+    <nav aria-label="Percorso" class="text-sm text-fumo">
+      <a href="/catalogo/" class="underline underline-offset-4 transition-colors hover:text-fiamma">
+        Catalogo
+      </a>
+      <span class="mx-2" aria-hidden="true">/</span>
+      <span>{nome}</span>
+    </nav>
+
+    <h1 class="mt-5 text-4xl sm:text-5xl">{collezione.data.nome}</h1>
+
+    {
+      collezione.data.descrizione && (
+        <p class="mt-4 max-w-xl text-lg leading-relaxed text-fumo">{collezione.data.descrizione}</p>
+      )
+    }
+
+    <p class="mt-5 text-sm text-fumo">
+      {prodotti.length}
+      {prodotti.length === 1 ? 'pezzo' : 'pezzi'}
+      {esclusivi > 0 && ` · ${esclusivi} a stampo esclusivo`}
+    </p>
+  </section>
+
+  <section class="contenitore pb-16">
+    <div class="grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+      {prodotti.map((prodotto, i) => <ProdottoCard prodotto={prodotto} priorita={i < 4} />)}
+    </div>
+  </section>
+
+  <section class="contenitore pb-16">
+    <div class="rounded-xl bg-sabbia p-8 text-center sm:p-12">
+      <h2 class="text-2xl sm:text-3xl">Non trovi quello che cerchi?</h2>
+      <p class="mx-auto mt-3 max-w-md leading-relaxed text-fumo">
+        Colori e fragranze si scelgono, e su richiesta creo anche pezzi che non sono a catalogo.
+      </p>
+      <div class="mt-7">
+        <BottoneWhatsApp
+          messaggio={`Ciao Alessia! Ho visto la collezione ${nome} e volevo chiederti una cosa.`}
+        />
+      </div>
+    </div>
+  </section>
+</Base>

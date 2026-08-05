@@ -1,0 +1,73 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+  /** La collezione aperta, per evidenziarla. */
+  attiva?: string;
+}
+
+const { attiva } = Astro.props;
+
+const prodotti = await getCollection('prodotti');
+const collezioni = (await getCollection('collezioni'))
+  .sort((a, b) => a.data.ordine - b.data.ordine)
+  .map((c) => ({
+    ...c,
+    quanti: prodotti.filter((p) => p.data.collezione?.id === c.id).length,
+  }))
+  .filter((c) => c.quanti > 0);
+
+const stile = (aperta: boolean) =>
+  [
+    'inline-block rounded-full px-4 py-1.5 text-sm transition-colors duration-200',
+    aperta
+      ? 'bg-inchiostro text-crema'
+      : 'bg-sabbia text-fumo hover:bg-lino hover:text-inchiostro',
+  ].join(' ');
+---
+
+<!-- Barra per saltare da una collezione all'altra senza tornare indietro.
+     Con dodici collezioni, dover risalire ogni volta e' il motivo per cui
+     un catalogo sembra lungo.
+
+     Resta a una riga sola e scorre in orizzontale: mandarla a capo su
+     schermo largo la faceva diventare alta il doppio, e una barra
+     appiccicata alta il doppio ruba lo spazio ai prodotti. Il fondo e'
+     pieno, non trasparente, altrimenti il testo della pagina si intravede
+     sotto mentre scorre. -->
+<nav
+  aria-label="Collezioni"
+  class="sticky top-[3.4rem] z-30 border-b border-lino bg-crema sm:top-[4.1rem]"
+>
+  <div class="contenitore relative">
+    <!-- Sfumatura sul bordo: dice che l'elenco continua, senza aggiungere
+         frecce da premere. -->
+    <div
+      class="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-crema to-transparent"
+      aria-hidden="true"
+    >
+    </div>
+
+    <div class="-mx-6 overflow-x-auto px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <ul class="flex items-center gap-2 py-2.5 whitespace-nowrap">
+        <li>
+          <a href="/catalogo/" class={stile(attiva === undefined)}>Tutte</a>
+        </li>
+        {
+          collezioni.map((c) => (
+            <li>
+              <a
+                href={`/collezioni/${c.id}/`}
+                aria-current={attiva === c.id ? 'page' : undefined}
+                class={stile(attiva === c.id)}
+              >
+                {c.data.nome.replace(/^Collezione /, '')}
+                <span class="ml-1.5 text-xs opacity-60 tabular-nums">{c.quanti}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</nav>

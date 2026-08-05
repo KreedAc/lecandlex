@@ -81,6 +81,21 @@ const datiStrutturati = {
       <a href="/catalogo/" class="underline underline-offset-4 transition-colors hover:text-fiamma">
         Catalogo
       </a>
+      {
+        collezione && (
+          <>
+            <span class="mx-2" aria-hidden="true">
+              /
+            </span>
+            <a
+              href={`/collezioni/${collezione.id}/`}
+              class="underline underline-offset-4 transition-colors hover:text-fiamma"
+            >
+              {collezione.data.nome.replace(/^Collezione /, '')}
+            </a>
+          </>
+        )
+      }
       <span class="mx-2" aria-hidden="true">/</span>
       <span>{d.nome}</span>
     </nav>
@@ -95,7 +110,7 @@ const datiStrutturati = {
         sizes="(min-width: 1024px) 34rem, 92vw"
         loading="eager"
         fetchpriority="high"
-        class="w-full rounded-lg bg-sabbia object-cover"
+        class="w-full rounded-xl bg-sabbia object-cover"
       />
       {
         galleria.map((f) => (
@@ -105,7 +120,7 @@ const datiStrutturati = {
             widths={[500, 800, 1200]}
             sizes="(min-width: 1024px) 34rem, 92vw"
             loading="lazy"
-            class="w-full rounded-lg bg-sabbia object-cover"
+            class="w-full rounded-xl bg-sabbia object-cover"
           />
         ))
       }
@@ -189,7 +204,7 @@ const datiStrutturati = {
 
       {
         d.materiale === 'cera' && (
-          <p class="mt-8 rounded-lg bg-sabbia p-5 text-sm leading-relaxed text-fumo">
+          <p class="mt-8 rounded-xl bg-sabbia p-5 text-sm leading-relaxed text-fumo">
             La stagionatura è fondamentale per la durata: aspetta almeno {sito.stagionaturaGiorni}{' '}
             giorni prima di accenderla.{' '}
             <a href="/cura/" class="underline underline-offset-4 transition-colors hover:text-fiamma">
@@ -204,7 +219,17 @@ const datiStrutturati = {
   {
     altri.length > 0 && (
       <section class="contenitore pb-6">
-        <h2 class="border-b border-lino pb-5 text-2xl sm:text-3xl">Dalla stessa collezione</h2>
+        <div class="flex flex-wrap items-end justify-between gap-4 border-b border-lino pb-5">
+          <h2 class="text-2xl sm:text-3xl">Dalla stessa collezione</h2>
+          {collezione && (
+            <a
+              href={`/collezioni/${collezione.id}/`}
+              class="text-sm text-fumo underline underline-offset-4 transition-colors hover:text-fiamma"
+            >
+              Vedi tutti
+            </a>
+          )}
+        </div>
         <div class="mt-8 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
           {altri.map((p) => (
             <ProdottoCard prodotto={p} />

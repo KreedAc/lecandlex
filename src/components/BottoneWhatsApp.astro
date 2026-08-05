@@ -10,9 +10,12 @@ interface Props {
 
 const { messaggio, testo = 'Scrivimi su WhatsApp', variante = 'pieno', class: classe = '' } = Astro.props;
 
+// Allineati a Bottone.astro: due bottoni accostati devono avere la stessa
+// forma e la stessa reazione al tocco, altrimenti sembrano di due siti.
 const stili = {
   pieno: 'bg-fiamma text-crema hover:bg-fiamma-scuro',
-  contorno: 'border border-inchiostro text-inchiostro hover:bg-inchiostro hover:text-crema',
+  contorno:
+    'border border-inchiostro/25 text-inchiostro hover:border-inchiostro hover:bg-inchiostro hover:text-crema',
 };
 ---
 
@@ -21,7 +24,8 @@ const stili = {
   target="_blank"
   rel="noopener"
   class:list={[
-    'inline-flex items-center justify-center gap-2.5 rounded-full px-6 py-3 text-sm font-medium transition-colors',
+    'inline-flex items-center justify-center gap-2.5 rounded-full px-6 py-3 text-sm font-medium',
+    'transition-[background-color,border-color,color,transform] duration-200 active:scale-[0.98]',
     stili[variante],
     classe,
   ]}
