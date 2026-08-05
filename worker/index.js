@@ -26,15 +26,30 @@ const COOKIE = 'lecandlex_oauth_state';
  * cliente: tanto vale spiegargli dove mettere le mani invece di dirgli
  * solo che manca qualcosa.
  */
-function mancaVariabile(nome) {
+function mancaVariabile(nome, env) {
+  // Solo i NOMI di quello che il Worker riceve, mai i valori. Serve a
+  // distinguere "l'ho messa nel posto sbagliato" da "ho sbagliato a
+  // scrivere il nome", che dall'esterno sembrano lo stesso errore.
+  const viste = Object.keys(env ?? {}).sort();
+
   return [
     `Manca la variabile ${nome}.`,
     '',
-    'Su Cloudflare: Workers & Pages -> lecandlex -> Settings ->',
-    'Variables and Secrets -> Add.',
+    'Quello che il Worker vede in questo momento:',
+    viste.length ? viste.map((v) => `  - ${v}`).join('\n') : '  (niente)',
     '',
-    'Spunta "Encrypt" su entrambe le variabili: quelle in chiaro possono',
-    'essere azzerate dal prossimo deploy, quelle cifrate no.',
+    "Se in quell'elenco non compare il nome che ti aspetti, le variabili",
+    'sono state salvate tra quelle della BUILD: servono a costruire il sito',
+    'e non arrivano al Worker. Vanno messe tra quelle di esecuzione:',
+    '',
+    '  Workers & Pages -> lecandlex -> Settings ->',
+    '  Variables and Secrets -> Add',
+    '',
+    'Dopo averle aggiunte premi "Deploy" in fondo alla pagina, altrimenti',
+    'non vengono salvate.',
+    '',
+    'Spunta "Encrypt" su entrambe: quelle in chiaro possono essere azzerate',
+    'dal prossimo deploy, quelle cifrate no.',
     '',
     'I valori si prendono dalla OAuth App su GitHub:',
     'Settings -> Developer settings -> OAuth Apps.',
@@ -103,7 +118,7 @@ function leggiCookie(request, nome) {
 
 async function avviaLogin(request, env, url) {
   if (!env.GITHUB_CLIENT_ID) {
-    return testo(mancaVariabile('GITHUB_CLIENT_ID'), 500);
+    return testo(mancaVariabile('GITHUB_CLIENT_ID', env), 500);
   }
 
   // Valore casuale che ritroveremo nella risposta di GitHub: se non
@@ -135,7 +150,7 @@ async function concludiLogin(request, env, url) {
     return testo('Sessione di accesso non valida. Riprova dal pannello.', 403);
   }
   if (!env.GITHUB_CLIENT_SECRET) {
-    return testo(mancaVariabile('GITHUB_CLIENT_SECRET'), 500);
+    return testo(mancaVariabile('GITHUB_CLIENT_SECRET', env), 500);
   }
 
   const risposta = await fetch(TOKEN, {
