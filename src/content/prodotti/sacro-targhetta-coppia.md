@@ -1,12 +1,15 @@
 ---
-nome: "Targhetta coppia"
+nome: Targhetta coppia
 collezione: sacro
 prezzo: 5
+copertina: /src/assets/prodotti/product-173.jpg
+altCopertina: ''
+pesoGrammi: null
+dimensioni: 7x7 cm
 materiale: jesmonite
-dimensioni: "7x7 cm"
+estratto: ''
 profumabile: false
-nota: "Calamita o da appendere."
+nota: Calamita o da appendere.
 ordine: 1670
 paginaCatalogo: 68
 ---
-
