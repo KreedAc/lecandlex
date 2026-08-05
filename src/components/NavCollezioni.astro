@@ -2,11 +2,17 @@
 import { getCollection } from 'astro:content';
 
 interface Props {
-  /** La collezione aperta, per evidenziarla. */
+  /**
+   * `ancore` — i pulsanti portano alle sezioni della stessa pagina e si
+   *   accendono da soli mentre si scorre.
+   * `pagine` — i pulsanti portano alle pagine delle singole collezioni.
+   */
+  modo?: 'ancore' | 'pagine';
+  /** La collezione aperta, quando siamo su una pagina dedicata. */
   attiva?: string;
 }
 
-const { attiva } = Astro.props;
+const { modo = 'pagine', attiva } = Astro.props;
 
 const prodotti = await getCollection('prodotti');
 const collezioni = (await getCollection('collezioni'))
@@ -17,13 +23,10 @@ const collezioni = (await getCollection('collezioni'))
   }))
   .filter((c) => c.quanti > 0);
 
-const stile = (aperta: boolean) =>
-  [
-    'inline-block rounded-full px-4 py-1.5 text-sm transition-colors duration-200',
-    aperta
-      ? 'bg-inchiostro text-crema'
-      : 'bg-sabbia text-fumo hover:bg-lino hover:text-inchiostro',
-  ].join(' ');
+const base =
+  'inline-block rounded-full px-4 py-1.5 text-sm transition-colors duration-200 ' +
+  'bg-sabbia text-fumo hover:bg-lino hover:text-inchiostro';
+const acceso = 'bg-inchiostro text-crema hover:bg-inchiostro hover:text-crema';
 ---
 
 <!-- Barra per saltare da una collezione all'altra senza tornare indietro.
@@ -40,6 +43,7 @@ const stile = (aperta: boolean) =>
      all'intestazione: cosi' non possono sfasarsi e sovrapporsi. -->
 <nav
   aria-label="Collezioni"
+  data-nav-collezioni={modo === 'ancore' ? 'ancore' : undefined}
   class="sticky top-(--altezza-intestazione) z-30 border-b border-lino bg-crema"
 >
   <div class="contenitore relative">
@@ -52,19 +56,27 @@ const stile = (aperta: boolean) =>
     </div>
 
     <div
+      data-scorrevole
       class="-mx-6 overflow-x-auto px-6 [scrollbar-width:none] lg:mx-0 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden"
     >
       <ul class="flex items-center gap-2 py-2.5 whitespace-nowrap lg:flex-wrap lg:gap-y-1.5">
-        <li>
-          <a href="/catalogo/" class={stile(attiva === undefined)}>Tutte</a>
-        </li>
+        {
+          modo === 'pagine' && (
+            <li>
+              <a href="/catalogo/" class:list={[base, attiva === undefined && acceso]}>
+                Tutte
+              </a>
+            </li>
+          )
+        }
         {
           collezioni.map((c) => (
             <li>
               <a
-                href={`/collezioni/${c.id}/`}
+                href={modo === 'ancore' ? `#${c.id}` : `/collezioni/${c.id}/`}
+                data-collezione={c.id}
                 aria-current={attiva === c.id ? 'page' : undefined}
-                class={stile(attiva === c.id)}
+                class:list={[base, attiva === c.id && acceso]}
               >
                 {c.data.nome.replace(/^Collezione /, '')}
                 <span class="ml-1.5 text-xs opacity-60 tabular-nums">{c.quanti}</span>
@@ -76,3 +88,101 @@ const stile = (aperta: boolean) =>
     </div>
   </div>
 </nav>
+
+{
+  modo === 'ancore' && (
+    <script>
+      {
+        /**
+         * Accende il pulsante della collezione che si sta guardando.
+         *
+         * E' l'unico JavaScript del sito: senza, la pagina funziona
+         * ancora — i pulsanti restano collegamenti che portano alla
+         * sezione giusta. Questo aggiunge solo l'evidenziazione.
+         */
+        const barra = document.querySelector('[data-nav-collezioni="ancore"]');
+        const sezioni = Array.from(document.querySelectorAll('[data-sezione-collezione]'));
+
+        if (barra && sezioni.length) {
+          const pulsanti = new Map(
+            Array.from(barra.querySelectorAll('[data-collezione]')).map((a) => [
+              a.getAttribute('data-collezione'),
+              a,
+            ])
+          );
+          const scorrevole = barra.querySelector('[data-scorrevole]');
+          const acceso = ['bg-inchiostro', 'text-crema'];
+          const spento = ['bg-sabbia', 'text-fumo'];
+          let corrente: string | null = null;
+
+          const accendi = (id: string | null) => {
+            if (id === corrente) return;
+            corrente = id;
+
+            for (const [chiave, pulsante] of pulsanti) {
+              const attivo = chiave === id;
+              pulsante.classList.toggle(acceso[0], attivo);
+              pulsante.classList.toggle(acceso[1], attivo);
+              pulsante.classList.toggle(spento[0], !attivo);
+              pulsante.classList.toggle(spento[1], !attivo);
+              if (attivo) {
+                pulsante.setAttribute('aria-current', 'true');
+              } else {
+                pulsante.removeAttribute('aria-current');
+              }
+            }
+
+            // Su telefono la barra scorre: il pulsante acceso deve restare
+            // visibile, altrimenti l'evidenziazione non si vede.
+            const pulsante = pulsanti.get(id);
+            if (pulsante && scorrevole && scorrevole.scrollWidth > scorrevole.clientWidth) {
+              const b = pulsante.getBoundingClientRect();
+              const c = scorrevole.getBoundingClientRect();
+              if (b.left < c.left || b.right > c.right) {
+                scorrevole.scrollTo({
+                  left: scorrevole.scrollLeft + (b.left - c.left) - 24,
+                  behavior: 'smooth',
+                });
+              }
+            }
+          };
+
+          /**
+           * La sezione "corrente" e' quella il cui inizio e' appena passato
+           * sotto le barre appiccicate. Guardare la piu' visibile darebbe
+           * un risultato ballerino con sezioni di altezze molto diverse:
+           * la Xmas ha 42 pezzi, Autunno ne ha 5.
+           */
+          const aggiorna = () => {
+            // Il margine e' generoso di proposito: saltando a una collezione
+            // il suo titolo atterra appena sotto le barre, e con una soglia
+            // stretta si sarebbe acceso il pulsante di quella precedente.
+            const soglia = barra.getBoundingClientRect().bottom + 40;
+            let scelta = sezioni[0];
+
+            for (const sezione of sezioni) {
+              if (sezione.getBoundingClientRect().top <= soglia) scelta = sezione;
+              else break;
+            }
+
+            accendi(scelta.getAttribute('data-sezione-collezione'));
+          };
+
+          let inAttesa = false;
+          const suScorrimento = () => {
+            if (inAttesa) return;
+            inAttesa = true;
+            requestAnimationFrame(() => {
+              inAttesa = false;
+              aggiorna();
+            });
+          };
+
+          addEventListener('scroll', suScorrimento, { passive: true });
+          addEventListener('resize', suScorrimento, { passive: true });
+          aggiorna();
+        }
+      }
+    </script>
+  )
+}

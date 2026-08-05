@@ -3,6 +3,7 @@ import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import NavCollezioni from '../../components/NavCollezioni.astro';
 import ProdottoCard from '../../components/ProdottoCard.astro';
+import BottoneWhatsApp from '../../components/BottoneWhatsApp.astro';
 import { prezzo } from '../../lib/sito';
 
 const prodotti = await getCollection('prodotti');
@@ -16,20 +17,18 @@ const gruppi = collezioni
       .filter((p) => p.data.collezione?.id === collezione.id)
       .sort((a, b) => a.data.ordine - b.data.ordine);
 
-    // Il prezzo piu' basso della collezione: dice a colpo d'occhio se e'
-    // la sezione dei pensierini o quella dei pezzi importanti.
     const prezziMinimi = suoi
       .flatMap((p) => [p.data.prezzo, ...p.data.varianti.map((v) => v.prezzo)])
       .filter((v): v is number => typeof v === 'number');
 
     return {
       collezione,
-      quanti: suoi.length,
+      prodotti: suoi,
       da: prezziMinimi.length ? Math.min(...prezziMinimi) : undefined,
       esclusivi: suoi.filter((p) => p.data.stampoEsclusivo).length,
     };
   })
-  .filter((g) => g.quanti > 0);
+  .filter((g) => g.prodotti.length > 0);
 
 const vuote = collezioni.filter((c) => !prodotti.some((p) => p.data.collezione?.id === c.id));
 
@@ -38,83 +37,70 @@ const orfani = prodotti
   .sort((a, b) => a.data.ordine - b.data.ordine);
 
 const totaleEsclusivi = prodotti.filter((p) => p.data.stampoEsclusivo).length;
+
+// Solo le prime immagini della pagina vanno caricate subito. Tutte le
+// altre restano pigre: con 192 prodotti su una pagina sola, caricarle
+// tutte in partenza sarebbe un disastro su rete mobile.
+let contatoreImmagini = 0;
 ---
 
 <Base
   titolo="Catalogo"
   descrizione="Candele scultura e complementi d'arredo in ceramica, divisi per collezione."
 >
-  <NavCollezioni />
+  <NavCollezioni modo="ancore" />
 
-  <section class="contenitore pt-10 pb-10 lg:pt-14">
-    <h1 class="text-4xl sm:text-5xl">Le collezioni</h1>
+  <section class="contenitore pt-10 pb-12 lg:pt-14">
+    <h1 class="text-4xl sm:text-5xl">Il catalogo</h1>
     <p class="mt-5 max-w-xl text-lg leading-relaxed text-fumo">
       {prodotti.length} pezzi divisi in {gruppi.length} collezioni, di cui {totaleEsclusivi} da stampi
       creati qui e che non trovi altrove.
     </p>
   </section>
 
-  <!-- Ogni collezione e' una scheda: da qui si sceglie dove andare invece
-       di scorrere duecento prodotti in fila. -->
-  <section class="contenitore pb-16">
-    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {
-        gruppi.map(({ collezione, quanti, da, esclusivi }) => (
-          <li>
-            <a
-              href={`/collezioni/${collezione.id}/`}
-              class="group flex h-full flex-col rounded-xl border border-lino bg-sabbia/50 p-6 transition-colors duration-200 hover:border-fiamma/40 hover:bg-sabbia"
-            >
-              <div class="flex items-baseline justify-between gap-3">
-                <h2 class="text-2xl leading-tight transition-colors group-hover:text-fiamma">
-                  {collezione.data.nome.replace(/^Collezione /, '')}
-                </h2>
-                <span class="shrink-0 text-sm text-fumo tabular-nums">{quanti}</span>
-              </div>
+  <!-- Tutte le collezioni una sotto l'altra: si scorre e basta. La barra
+       qui sopra accende da sola quella che si sta guardando.
 
-              {esclusivi > 0 && (
-                <p class="mt-2 text-xs text-fumo">
-                  {esclusivi} {esclusivi === 1 ? 'pezzo' : 'pezzi'} a stampo esclusivo
-                </p>
-              )}
+       `scroll-mt` tiene conto delle due barre appiccicate: senza, saltando
+       a una collezione il suo titolo finirebbe nascosto dietro. -->
+  {
+    gruppi.map(({ collezione, prodotti: elenco, da, esclusivi }) => (
+      <section
+        id={collezione.id}
+        data-sezione-collezione={collezione.id}
+        class="contenitore scroll-mt-28 pb-14 lg:scroll-mt-44"
+      >
+        <div class="border-b border-lino pb-5">
+          <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <h2 class="text-2xl sm:text-3xl">{collezione.data.nome}</h2>
+            <p class="text-sm text-fumo tabular-nums">
+              {elenco.length} {elenco.length === 1 ? 'pezzo' : 'pezzi'}
+              {da !== undefined && ` · da ${prezzo(da)}`}
+              {esclusivi > 0 && ` · ${esclusivi} a stampo esclusivo`}
+            </p>
+          </div>
 
-              {collezione.data.descrizione && (
-                <p class="mt-3 flex-1 text-sm leading-relaxed text-fumo">
-                  {collezione.data.descrizione}
-                </p>
-              )}
+          {collezione.data.descrizione && (
+            <p class="mt-2 max-w-2xl text-sm leading-relaxed text-fumo">
+              {collezione.data.descrizione}
+            </p>
+          )}
+        </div>
 
-              <div class="mt-6 flex items-center justify-between gap-3 border-t border-lino pt-4 text-sm">
-                <span class="text-fumo">{da !== undefined ? `da ${prezzo(da)}` : ' '}</span>
-                <span class="flex items-center gap-1.5 text-inchiostro">
-                  Guarda
-                  <svg
-                    viewBox="0 0 16 16"
-                    width="14"
-                    height="14"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    aria-hidden="true"
-                    class="transition-transform duration-200 group-hover:translate-x-1"
-                  >
-                    <path d="M2 8h11M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </span>
-              </div>
-
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </section>
+        <div class="mt-8 grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
+          {elenco.map((prodotto) => (
+            <ProdottoCard prodotto={prodotto} priorita={contatoreImmagini++ < 4} />
+          ))}
+        </div>
+      </section>
+    ))
+  }
 
   {
     orfani.length > 0 && (
-      <section class="contenitore pb-16">
+      <section class="contenitore scroll-mt-28 pb-14 lg:scroll-mt-44">
         <h2 class="border-b border-lino pb-5 text-2xl sm:text-3xl">Altri prodotti</h2>
-        <div class="mt-8 grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-4">
+        <div class="mt-8 grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:grid-cols-4">
           {orfani.map((prodotto) => (
             <ProdottoCard prodotto={prodotto} />
           ))}
@@ -125,7 +111,7 @@ const totaleEsclusivi = prodotti.filter((p) => p.data.stampoEsclusivo).length;
 
   {
     vuote.length > 0 && (
-      <section class="contenitore pb-16">
+      <section class="contenitore pb-14">
         <div class="rounded-xl bg-sabbia p-8 sm:p-10">
           <h2 class="text-2xl">Altre collezioni in arrivo online</h2>
           <p class="mt-3 max-w-2xl leading-relaxed text-fumo">
@@ -143,4 +129,16 @@ const totaleEsclusivi = prodotti.filter((p) => p.data.stampoEsclusivo).length;
       </section>
     )
   }
+
+  <section class="contenitore pb-16">
+    <div class="rounded-xl bg-sabbia p-8 text-center sm:p-12">
+      <h2 class="text-2xl sm:text-3xl">Non trovi quello che cerchi?</h2>
+      <p class="mx-auto mt-3 max-w-md leading-relaxed text-fumo">
+        Colori e fragranze si scelgono, e su richiesta creo anche pezzi che non sono a catalogo.
+      </p>
+      <div class="mt-7">
+        <BottoneWhatsApp messaggio="Ciao Alessia! Ho guardato il catalogo e volevo chiederti una cosa." />
+      </div>
+    </div>
+  </section>
 </Base>
