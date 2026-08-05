@@ -2,7 +2,7 @@
 nome: Tormalina
 collezione: preziosa
 prezzo: 9
-copertina: ../../assets/prodotti/preziosa-tormalina.jpg
+copertina: /src/assets/prodotti/preziosa-tormalina.jpg
 altCopertina: Candela in latta dorata con pietre di tormalina nera sulla cera, accanto a due grezzi di tormalina
 materiale: cera
 pesoGrammi: 80

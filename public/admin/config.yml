@@ -24,8 +24,14 @@ publish_mode: simple
 # nient'altro si rompe.
 site_url: https://lecandlex.pages.dev
 
+# Le foto stanno in src/assets/ e non in public/, cosi' Astro le ottimizza
+# in WebP/AVIF responsive invece di servire gli originali dal telefono.
+#
+# public_folder deve essere un percorso assoluto: Sveltia rifiuta quelli
+# relativi. Astro risolve comunque `/src/assets/...` dalla radice del
+# progetto e ottimizza l'immagine, quindi vanno d'accordo entrambi.
 media_folder: src/assets/prodotti
-public_folder: ../../assets/prodotti
+public_folder: /src/assets/prodotti
 
 collections:
   - name: prodotti

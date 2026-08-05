@@ -2,7 +2,7 @@
 nome: Ametista
 collezione: preziosa
 prezzo: 9
-copertina: ../../assets/prodotti/preziosa-ametista.jpg
+copertina: /src/assets/prodotti/preziosa-ametista.jpg
 altCopertina: Candela in latta dorata con scaglie di ametista viola sulla cera, accanto al coperchio e a cristalli sparsi
 materiale: cera
 pesoGrammi: 80

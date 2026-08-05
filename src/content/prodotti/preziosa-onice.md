@@ -2,7 +2,7 @@
 nome: Onice
 collezione: preziosa
 prezzo: 9
-copertina: ../../assets/prodotti/preziosa-onice.jpg
+copertina: /src/assets/prodotti/preziosa-onice.jpg
 altCopertina: Candela in latta dorata con pietre di onice sulla superficie di cera, accanto al coperchio e a pietre sparse
 materiale: cera
 pesoGrammi: 80
