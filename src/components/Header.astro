@@ -10,26 +10,35 @@ const voci = [
   { href: '/contatti/', testo: 'Contatti' },
 ];
 
-const attiva = (href: string) => percorso === href || percorso.startsWith(href);
+// Il catalogo si raggiunge anche dalle pagine delle collezioni: la voce
+// del menu deve restare accesa anche li'.
+const attiva = (href: string) =>
+  percorso === href ||
+  percorso.startsWith(href) ||
+  (href === '/catalogo/' && percorso.startsWith('/collezioni/'));
 ---
 
-<!-- Su mobile logo e navigazione stanno su due righe: a 390px affiancarli
-     tagliava l'ultima voce a meta'. La nav scorre in orizzontale invece di
-     nascondersi dietro un hamburger — cinque voci brevi non giustificano un
-     menu a tendina, e un link sempre visibile viene cliccato molto di piu'. -->
-<header class="sticky top-0 z-40 border-b border-lino bg-crema">
-  <div
-    class="contenitore flex flex-col gap-0.5 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:py-3.5"
-  >
-    <a href="/" class="font-display text-2xl leading-none tracking-tight">
+<!-- Altezza fissa, dichiarata in global.css: la barra delle collezioni si
+     appiccica esattamente sotto questa misura, e due valori che devono
+     combaciare e' meglio scriverli una volta sola.
+
+     Logo e menu su una riga anche su mobile: due righe raddoppiavano
+     l'ingombro, e sommate alla barra delle collezioni mangiavano un terzo
+     dello schermo del telefono. Il menu scorre, con una sfumatura sul
+     bordo che dice che continua. -->
+<header
+  class="sticky top-0 z-40 h-(--altezza-intestazione) border-b border-lino bg-crema"
+>
+  <div class="contenitore relative flex h-full items-center gap-4">
+    <a href="/" class="shrink-0 font-display text-xl leading-none tracking-tight sm:text-2xl">
       {sito.nome}
     </a>
 
     <nav
       aria-label="Principale"
-      class="-mx-6 overflow-x-auto px-6 sm:mx-0 sm:overflow-visible sm:px-0"
+      class="-mr-6 min-w-0 flex-1 overflow-x-auto pr-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
-      <ul class="flex items-center gap-5 whitespace-nowrap text-sm sm:gap-6">
+      <ul class="flex items-center justify-end gap-4 whitespace-nowrap text-sm sm:gap-6">
         {
           voci.map((voce) => (
             <li>
@@ -37,7 +46,7 @@ const attiva = (href: string) => percorso === href || percorso.startsWith(href);
                 href={voce.href}
                 aria-current={attiva(voce.href) ? 'page' : undefined}
                 class:list={[
-                  'py-2 transition-colors hover:text-fiamma',
+                  'block py-2 transition-colors duration-200 hover:text-fiamma',
                   attiva(voce.href) ? 'text-fiamma' : 'text-fumo',
                 ]}
               >
@@ -48,5 +57,11 @@ const attiva = (href: string) => percorso === href || percorso.startsWith(href);
         }
       </ul>
     </nav>
+
+    <div
+      class="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-crema to-transparent sm:hidden"
+      aria-hidden="true"
+    >
+    </div>
   </div>
 </header>

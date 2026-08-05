@@ -10,6 +10,10 @@ const faq = [
       'Scrivimi su WhatsApp o su Instagram dicendomi cosa ti interessa. Ti confermo disponibilità e totale, e ti mando i dettagli per il pagamento. Non c’è un carrello: preferisco parlare con chi compra.',
   },
   {
+    domanda: 'Quanto costa la spedizione e quanto ci mette?',
+    risposta: `La spedizione parte da ${sito.spedizione.costo.replace('da ', '')}, è rapida e tracciata, e arriva in ${sito.spedizione.tempi.replace(', tracciata', '')}.${sito.spedizione.ritiroInPersona ? ' Se sei in zona puoi anche ritirare di persona e risparmiarla.' : ''}`,
+  },
+  {
     domanda: 'Posso scegliere la fragranza?',
     risposta:
       'Sì. Le candele si possono profumare con una qualsiasi delle fragranze disponibili, elencate nella pagina Cura. Dimmi quale preferisci quando ordini.',

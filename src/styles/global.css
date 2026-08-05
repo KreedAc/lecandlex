@@ -40,6 +40,20 @@
 }
 
 @layer base {
+  /* L'intestazione ha un'altezza fissa e la barra delle collezioni si
+     appiccica esattamente sotto. Prima erano due numeri scritti a mano in
+     file diversi: bastava che non combaciassero perche' la barra coprisse
+     i prodotti. */
+  :root {
+    --altezza-intestazione: 3.5rem;
+  }
+
+  @media (min-width: 640px) {
+    :root {
+      --altezza-intestazione: 4rem;
+    }
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;

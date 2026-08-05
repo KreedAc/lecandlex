@@ -34,10 +34,13 @@ const stile = (aperta: boolean) =>
      schermo largo la faceva diventare alta il doppio, e una barra
      appiccicata alta il doppio ruba lo spazio ai prodotti. Il fondo e'
      pieno, non trasparente, altrimenti il testo della pagina si intravede
-     sotto mentre scorre. -->
+     sotto mentre scorre.
+
+     La distanza dall'alto viene dalla stessa variabile che da' l'altezza
+     all'intestazione: cosi' non possono sfasarsi e sovrapporsi. -->
 <nav
   aria-label="Collezioni"
-  class="sticky top-[3.4rem] z-30 border-b border-lino bg-crema sm:top-[4.1rem]"
+  class="sticky top-(--altezza-intestazione) z-30 border-b border-lino bg-crema"
 >
   <div class="contenitore relative">
     <!-- Sfumatura sul bordo: dice che l'elenco continua, senza aggiungere

@@ -14,9 +14,9 @@
   "preavvisoBomboniereMesi": 2,
   "stagionaturaGiorni": 5,
   "spedizione": {
-    "costo": "DA CONFERMARE",
-    "gratisDa": "DA CONFERMARE",
-    "tempi": "DA CONFERMARE",
+    "costo": "da 9 €",
+    "gratisDa": "",
+    "tempi": "48 ore, tracciata",
     "ritiroInPersona": true
   }
 }

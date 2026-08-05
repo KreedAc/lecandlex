@@ -39,6 +39,10 @@ const anno = new Date().getFullYear();
     <div>
       <p class="occhiello">Buono a sapersi</p>
       <ul class="mt-4 space-y-2 text-sm text-fumo">
+        <li>
+          Spedizione {sito.spedizione.costo}, tracciata, in {sito.spedizione.tempi.replace(', tracciata', '')}
+        </li>
+        {sito.spedizione.gratisDa && <li>Gratis sopra {sito.spedizione.gratisDa}</li>}
         <li>Materiali 100% naturali, non testati sugli animali</li>
         <li>Omaggio a sorpresa per ordini da {sito.omaggioDa} €</li>
         <li>Bomboniere con {sito.preavvisoBomboniereMesi} mesi di preavviso</li>
