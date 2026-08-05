@@ -17,9 +17,17 @@
     // venivano servite.
     "directory": "./dist",
     "binding": "ASSETS",
-    // Gli indirizzi inesistenti mostrano la nostra pagina 404 invece di
-    // quella grigia di Cloudflare.
-    "not_found_handling": "404-page"
+    // DEVE restare "none".
+    //
+    // Con "404-page" e' il gestore degli asset a rispondere agli indirizzi
+    // che non corrispondono a un file, e lo fa restituendo la pagina 404
+    // *senza mai eseguire il Worker*. Il risultato e' che /auth e
+    // /callback — che non sono file ma codice — finivano anche loro sulla
+    // pagina 404, e il login del pannello non poteva funzionare.
+    //
+    // Con "none" gli indirizzi senza file passano al Worker, che gestisce
+    // il login e per tutto il resto restituisce lui la pagina 404.
+    "not_found_handling": "none"
   },
 
   "observability": {

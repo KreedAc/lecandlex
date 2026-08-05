@@ -147,6 +147,11 @@ async function concludiLogin(request, env, url) {
   return new Response(pagina.body, { status: pagina.status, headers });
 }
 
+/**
+ * Le richieste che corrispondono a un file del sito vengono servite prima
+ * di arrivare qui. Il Worker riceve solo il resto: le due rotte del login,
+ * e gli indirizzi che non esistono.
+ */
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -154,7 +159,12 @@ export default {
     if (url.pathname === '/auth') return avviaLogin(request, env, url);
     if (url.pathname === '/callback') return concludiLogin(request, env, url);
 
-    // Tutto il resto e' il sito: pagine, immagini, fogli di stile.
-    return env.ASSETS.fetch(request);
+    // Nessun file e nessuna rotta: mostriamo la pagina 404 del sito invece
+    // di quella grigia di Cloudflare.
+    const pagina404 = await env.ASSETS.fetch(new URL('/404.html', url.origin));
+    return new Response(pagina404.body, {
+      status: 404,
+      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+    });
   },
 };
