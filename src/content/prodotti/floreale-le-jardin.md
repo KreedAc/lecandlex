@@ -1,8 +1,13 @@
 ---
-nome: "Le Jardin"
+nome: Le Jardin
 collezione: floreale
 prezzo: 20
+copertina: /src/assets/prodotti/product-049.jpg
+altCopertina: ''
+pesoGrammi: null
+dimensioni: ''
 materiale: misto
+estratto: ''
 ordine: 420
 paginaCatalogo: 23
 ---

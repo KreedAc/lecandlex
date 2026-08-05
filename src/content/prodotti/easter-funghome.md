@@ -1,11 +1,13 @@
 ---
-nome: "Funghome"
+nome: Funghome
 collezione: easter
 prezzo: 9
-materiale: cera
+copertina: /src/assets/prodotti/product-073.jpg
+altCopertina: ''
 pesoGrammi: 140
-dimensioni: "6x7 cm"
+dimensioni: 6x7 cm
+materiale: cera
+estratto: ''
 ordine: 720
 paginaCatalogo: 33
 ---
-
