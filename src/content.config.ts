@@ -4,78 +4,131 @@ import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
 /**
- * SCHEMA PERMISSIVO — E' UNA SCELTA, NON UNA DIMENTICANZA
+ * SCHEMA TOLLERANTE — E' UNA SCELTA, NON UNA DIMENTICANZA
  *
- * Questo sito viene aggiornato da chi non scrive codice e non ha nessuno
- * a cui chiedere aiuto. Se un campo mancante facesse fallire la build, il
- * sito smetterebbe di aggiornarsi senza che nessuno capisca perche'.
+ * Questo sito viene aggiornato da chi non scrive codice e non ha nessuno a
+ * cui chiedere aiuto. Se un valore inatteso fa fallire la build, il sito
+ * smette di aggiornarsi e nessuno capisce perche': si continua a premere
+ * Pubblica e non succede niente.
  *
- * Quindi: qui e' obbligatorio solo il nome. Tutto il resto ha un
- * comportamento sensato quando manca (foto segnaposto, "prezzo su
- * richiesta", prodotto raggruppato tra gli altri). La severita' sta nel
- * form del CMS, dove l'errore si vede subito e si corregge, non nella
- * build, dove l'errore e' invisibile e blocca tutto.
+ * E' gia' successo. Il pannello, per un campo lasciato in bianco, non lo
+ * omette: ci scrive dentro `null` o una stringa vuota. Lo schema accettava
+ * "campo assente" ma non "campo presente e vuoto", e un prodotto con le
+ * varianti — che per forza ha il prezzo singolo vuoto — ha bloccato tutto,
+ * comprese le modifiche fatte dopo.
+ *
+ * Da qui la regola: prima di validare, ogni campo viene normalizzato e i
+ * valori vuoti diventano "non compilato". Si usa `preprocess` e non
+ * `transform` perche' deve accadere PRIMA del controllo di tipo: dopo
+ * sarebbe troppo tardi, il valore vuoto e' gia' passato.
+ *
+ * La severita' sta nel form del CMS, dove l'errore si vede subito e si
+ * corregge, non nella build, dove e' invisibile e ferma il sito.
  */
-const materiali = ['cera', 'ceramica', 'jesmonite', 'resina', 'vetro', 'misto'] as const;
 
-const variante = z.object({
-  nome: z.string().default('Formato unico'),
-  prezzo: z.number().optional(),
-  pesoGrammi: z.number().optional(),
-  dimensioni: z.string().optional(),
-});
+/** null, stringa vuota e spazi contano tutti come "non compilato". */
+const svuota = (v: unknown) =>
+  v === null || (typeof v === 'string' && v.trim() === '') ? undefined : v;
+
+/** Numero. Accetta anche i numeri scritti come testo, con la virgola. */
+const numero = z.preprocess((v) => {
+  const x = svuota(v);
+  if (typeof x === 'string') {
+    const n = Number(x.replace(',', '.'));
+    return Number.isFinite(n) ? n : undefined;
+  }
+  return typeof x === 'number' && Number.isFinite(x) ? x : undefined;
+}, z.number().optional());
+
+/** Numero con un valore predefinito quando manca. */
+const numeroCon = (predefinito: number) =>
+  z.preprocess((v) => {
+    const x = svuota(v);
+    if (typeof x === 'string') {
+      const n = Number(x.replace(',', '.'));
+      return Number.isFinite(n) ? n : predefinito;
+    }
+    return typeof x === 'number' && Number.isFinite(x) ? x : predefinito;
+  }, z.number());
+
+/** Testo. */
+const testo = z.preprocess(svuota, z.string().optional());
+
+/** Testo con un valore predefinito quando manca. */
+const testoCon = (predefinito: string) =>
+  z.preprocess((v) => svuota(v) ?? predefinito, z.string());
+
+/** Interruttore: qualunque cosa non sia vero/falso vale il predefinito. */
+const interruttore = (predefinito: boolean) =>
+  z.preprocess((v) => (typeof v === 'boolean' ? v : predefinito), z.boolean());
+
+/** Elenco: null e valori strani diventano un elenco vuoto. */
+const elenco = <T extends z.ZodTypeAny>(voce: T) =>
+  z.preprocess((v) => (Array.isArray(v) ? v : []), z.array(voce));
+
+const materiali = ['cera', 'ceramica', 'jesmonite', 'resina', 'vetro', 'misto'] as const;
 
 const prodotti = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/prodotti' }),
-  schema: ({ image }) =>
-    z.object({
-      nome: z.string(),
+  schema: ({ image }) => {
+    /** Immagine. Senza foto il prodotto mostra il segnaposto. */
+    const immagine = z.preprocess(svuota, image().optional());
+
+    const variante = z.object({
+      nome: testoCon('Formato unico'),
+      prezzo: numero,
+      pesoGrammi: numero,
+      dimensioni: testo,
+    });
+
+    return z.object({
+      nome: testoCon('Senza nome'),
 
       // Se la collezione viene rinominata o cancellata il prodotto non
       // sparisce e non rompe niente: finisce in fondo al catalogo.
-      collezione: reference('collezioni').optional(),
+      collezione: z.preprocess(svuota, reference('collezioni').optional()),
 
-      prezzo: z.number().optional(),
-      varianti: z.array(variante).default([]),
+      prezzo: numero,
+      varianti: elenco(variante),
 
-      // Senza foto il prodotto mostra un segnaposto pulito.
-      copertina: image().optional(),
-      altCopertina: z.string().optional(),
-      galleria: z
-        .array(z.object({ file: image().optional(), alt: z.string().optional() }))
-        .default([]),
+      copertina: immagine,
+      altCopertina: testo,
+      galleria: elenco(z.object({ file: immagine, alt: testo })),
 
-      materiale: z.enum(materiali).default('cera'),
-      pesoGrammi: z.number().optional(),
+      materiale: z.preprocess((v) => {
+        const x = svuota(v);
+        return typeof x === 'string' && (materiali as readonly string[]).includes(x) ? x : 'cera';
+      }, z.enum(materiali)),
+
+      pesoGrammi: numero,
       // Sempre "base x altezza", come dichiarato nel catalogo.
-      dimensioni: z.string().optional(),
+      dimensioni: testo,
 
       // Badge del catalogo: lo stampo e' disegnato e realizzato da
       // Le CandLex, non comprato.
-      stampoEsclusivo: z.boolean().default(false),
-      personalizzabile: z.boolean().default(false),
-      profumabile: z.boolean().default(true),
+      stampoEsclusivo: interruttore(false),
+      personalizzabile: interruttore(false),
+      profumabile: interruttore(true),
 
-      disponibile: z.boolean().default(true),
-      inEvidenza: z.boolean().default(false),
-      ordine: z.number().default(100),
-      nota: z.string().optional(),
-      // Nessun limite di lunghezza: un testo troppo lungo si tronca da
-      // solo con le CSS, non deve far fallire la pubblicazione.
-      estratto: z.string().optional(),
-      paginaCatalogo: z.number().optional(),
-    }),
+      disponibile: interruttore(true),
+      inEvidenza: interruttore(false),
+      ordine: numeroCon(100),
+      nota: testo,
+      estratto: testo,
+      paginaCatalogo: numero,
+    });
+  },
 });
 
 const collezioni = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/collezioni' }),
   schema: ({ image }) =>
     z.object({
-      nome: z.string(),
-      descrizione: z.string().optional(),
-      copertina: image().optional(),
-      altCopertina: z.string().optional(),
-      ordine: z.number().default(100),
+      nome: testoCon('Senza nome'),
+      descrizione: testo,
+      copertina: z.preprocess(svuota, image().optional()),
+      altCopertina: testo,
+      ordine: numeroCon(100),
     }),
 });
 
