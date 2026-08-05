@@ -25,7 +25,12 @@ const attiva = (href: string) =>
      Logo e menu su una riga anche su mobile: due righe raddoppiavano
      l'ingombro, e sommate alla barra delle collezioni mangiavano un terzo
      dello schermo del telefono. Il menu scorre, con una sfumatura sul
-     bordo che dice che continua. -->
+     bordo che dice che continua.
+
+     L'elenco parte da sinistra e non e' allineato a destra: allineandolo
+     a destra l'eccedenza finiva a sinistra, fuori dallo schermo e senza
+     modo di raggiungerla. Da tablet in su, dove ci sta tutto, torna a
+     destra. -->
 <header
   class="sticky top-0 z-40 h-(--altezza-intestazione) border-b border-lino bg-crema"
 >
@@ -38,7 +43,7 @@ const attiva = (href: string) =>
       aria-label="Principale"
       class="-mr-6 min-w-0 flex-1 overflow-x-auto pr-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
-      <ul class="flex items-center justify-end gap-4 whitespace-nowrap text-sm sm:gap-6">
+      <ul class="flex items-center gap-4 whitespace-nowrap text-sm sm:justify-end sm:gap-6">
         {
           voci.map((voce) => (
             <li>
