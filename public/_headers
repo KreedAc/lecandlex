@@ -1,0 +1,33 @@
+# Regole di cache, lette da Cloudflare.
+#
+# Il problema da risolvere: dopo una modifica dal pannello il sito si
+# ricostruisce, ma il browser continua a mostrare la versione vecchia
+# finche' non si svuota la cache a mano. Chi aggiorna il sito non deve
+# sapere cos'e' una cache.
+#
+# La soluzione non e' spegnerla ovunque: immagini, fogli di stile e font
+# hanno un'impronta nel nome del file, quindi quando cambiano cambia anche
+# l'indirizzo e non possono mai essere vecchi. Tenerli in cache e' cio' che
+# rende il sito veloce. Sono le pagine, che mantengono lo stesso indirizzo,
+# a dover essere sempre ricontrollate.
+#
+# ATTENZIONE: quando piu' regole corrispondono allo stesso indirizzo,
+# Cloudflare le somma invece di sostituirle. Con una regola generica /*
+# i file con l'impronta si ritrovavano sia "non conservare" sia "conserva
+# un anno", istruzioni che si annullano. Per questo le regole qui sotto
+# non si sovrappongono: le pagine finiscono sempre con una barra, i file
+# con l'impronta mai.
+
+# La prima pagina.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Tutte le altre pagine: il loro indirizzo finisce con una barra, quindi
+# questa regola non tocca i file dentro /risorse.
+/*/
+  Cache-Control: public, max-age=0, must-revalidate
+
+# File con l'impronta nel nome: immutabili per definizione, si possono
+# tenere un anno. E' qui che sta la velocita' del sito.
+/risorse/*
+  Cache-Control: public, max-age=31536000, immutable
