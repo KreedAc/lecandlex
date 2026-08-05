@@ -57,6 +57,22 @@ function mancaVariabile(nome, env) {
   ].join('\n');
 }
 
+/**
+ * Legge una credenziale dall'ambiente.
+ *
+ * Cloudflare offre due modi per fornirla: una variabile o un segreto
+ * normale, che arriva come stringa, oppure un binding al Secrets Store,
+ * che arriva come oggetto da cui si estrae il valore con .get().
+ * Il pannello li presenta insieme e non e' ovvio quale scegliere, quindi
+ * li accettiamo entrambi invece di imporne uno.
+ */
+async function credenziale(valore) {
+  if (!valore) return null;
+  if (typeof valore === 'string') return valore;
+  if (typeof valore.get === 'function') return await valore.get();
+  return null;
+}
+
 function testo(messaggio, stato = 400) {
   return new Response(messaggio, {
     status: stato,
@@ -118,7 +134,8 @@ function leggiCookie(request, nome) {
 }
 
 async function avviaLogin(request, env, url) {
-  if (!env.GITHUB_CLIENT_ID) {
+  const clientId = await credenziale(env.GITHUB_CLIENT_ID);
+  if (!clientId) {
     return testo(mancaVariabile('GITHUB_CLIENT_ID', env), 500);
   }
 
@@ -127,7 +144,7 @@ async function avviaLogin(request, env, url) {
   const stato = crypto.randomUUID();
 
   const destinazione = new URL(AUTORIZZA);
-  destinazione.searchParams.set('client_id', env.GITHUB_CLIENT_ID);
+  destinazione.searchParams.set('client_id', clientId);
   destinazione.searchParams.set('redirect_uri', `${url.origin}/callback`);
   destinazione.searchParams.set('scope', url.searchParams.get('scope') || 'repo,user');
   destinazione.searchParams.set('state', stato);
@@ -150,7 +167,9 @@ async function concludiLogin(request, env, url) {
   if (!stato || stato !== atteso) {
     return testo('Sessione di accesso non valida. Riprova dal pannello.', 403);
   }
-  if (!env.GITHUB_CLIENT_SECRET) {
+  const clientId = await credenziale(env.GITHUB_CLIENT_ID);
+  const clientSecret = await credenziale(env.GITHUB_CLIENT_SECRET);
+  if (!clientSecret) {
     return testo(mancaVariabile('GITHUB_CLIENT_SECRET', env), 500);
   }
 
@@ -158,8 +177,8 @@ async function concludiLogin(request, env, url) {
     method: 'POST',
     headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      client_id: env.GITHUB_CLIENT_ID,
-      client_secret: env.GITHUB_CLIENT_SECRET,
+      client_id: clientId,
+      client_secret: clientSecret,
       code: codice,
       redirect_uri: `${url.origin}/callback`,
     }),
