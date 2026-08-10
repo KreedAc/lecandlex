@@ -42,14 +42,20 @@ const vetrina = inEvidenza.length
       </div>
     </div>
 
+    <!-- Il marchio e' su tessuto: tutte sfumature morbide, e proprio li'
+         la compressione lascia le chiazze che fanno sembrare l'immagine
+         sgranata. Alziamo la qualita' solo qui — e' l'unica immagine del
+         sito fatta di gradienti, le foto dei prodotti non ne hanno
+         bisogno. -->
     <Image
       src={copertina}
       alt="Il marchio Le CandLex: un loto con una fiamma, su tessuto chiaro"
       widths={[500, 800, 1200]}
       sizes="(min-width: 1024px) 34rem, 92vw"
+      quality={90}
       loading="eager"
       fetchpriority="high"
-      class="w-full rounded-xl object-cover"
+      class="w-full rounded-xl"
     />
   </section>
 
