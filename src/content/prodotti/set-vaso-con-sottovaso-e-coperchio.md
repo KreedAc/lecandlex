@@ -1,9 +1,13 @@
 ---
-nome: "Vaso con sottovaso e coperchio"
+nome: Vaso con sottovaso e coperchio
 collezione: set
 prezzo: 15
+copertina: /src/assets/prodotti/product-187.jpg
+altCopertina: ''
+pesoGrammi: null
+dimensioni: 13x9 cm
 materiale: jesmonite
-dimensioni: "13x9 cm"
+estratto: ''
 personalizzabile: true
 profumabile: false
 ordine: 1820
