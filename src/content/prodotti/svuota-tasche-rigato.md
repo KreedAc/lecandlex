@@ -1,13 +1,13 @@
 ---
 nome: Svuota tasche rigato
-collezione: ''
+collezione: mondo-jesmonite
 prezzo: 15
 copertina: /src/assets/prodotti/IMG_6424.jpeg
-altCopertina: Svuota tasche tondo a righe 15cm
+altCopertina: Svuota tasche tondo a righe
 disponibile: true
 pesoGrammi: null
-dimensioni: 15cm
-materiale: ceramica
+dimensioni: ''
+materiale: jesmonite
 stampoEsclusivo: false
 inEvidenza: false
 estratto: ''
