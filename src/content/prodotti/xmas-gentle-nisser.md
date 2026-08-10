@@ -1,11 +1,13 @@
 ---
-nome: "Gentle Nisser"
+nome: Gentle Nisser
 collezione: xmas
 prezzo: 5
-materiale: cera
+copertina: /src/assets/prodotti/product-091.jpg
+altCopertina: ''
 pesoGrammi: 50
-dimensioni: "5x9 cm"
+dimensioni: 5x9 cm
+materiale: cera
+estratto: ''
 ordine: 900
 paginaCatalogo: 41
 ---
-
