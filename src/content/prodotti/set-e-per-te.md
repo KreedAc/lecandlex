@@ -1,12 +1,15 @@
 ---
-nome: "È per te"
+nome: È per te
 collezione: set
 prezzo: 25
-materiale: misto
+copertina: /src/assets/prodotti/product-186.jpg
+altCopertina: ''
 pesoGrammi: 200
-dimensioni: "13x9 cm"
+dimensioni: 13x9 cm
+materiale: misto
+estratto: ''
 personalizzabile: true
-nota: "Prezzo a partire da 25 €."
+nota: Prezzo a partire da 25 €.
 ordine: 1810
 paginaCatalogo: 71
 ---

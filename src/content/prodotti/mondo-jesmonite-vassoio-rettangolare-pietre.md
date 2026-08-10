@@ -1,13 +1,15 @@
 ---
-nome: "Vassoio rettangolare pietre"
+nome: Vassoio rettangolare pietre
 collezione: mondo-jesmonite
 prezzo: 16
-materiale: jesmonite
+copertina: /src/assets/prodotti/product-165.jpg
+altCopertina: ''
 pesoGrammi: 280
-dimensioni: "17x10 cm"
+dimensioni: 17x10 cm
+materiale: jesmonite
+estratto: ''
 personalizzabile: true
 profumabile: false
 ordine: 1610
 paginaCatalogo: 66
 ---
-

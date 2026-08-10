@@ -1,9 +1,13 @@
 ---
-nome: "Campo di Tulipani"
+nome: Campo di Tulipani
 collezione: set
 prezzo: 25
+copertina: /src/assets/prodotti/product-184.jpg
+altCopertina: ''
+pesoGrammi: null
+dimensioni: 13x9 cm
 materiale: misto
-dimensioni: "13x9 cm"
+estratto: ''
 personalizzabile: true
 ordine: 1800
 paginaCatalogo: 71

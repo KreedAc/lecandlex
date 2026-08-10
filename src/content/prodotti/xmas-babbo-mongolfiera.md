@@ -1,13 +1,15 @@
 ---
-nome: "Babbo Mongolfiera"
+nome: Babbo Mongolfiera
 collezione: xmas
 prezzo: 10
-materiale: cera
+copertina: /src/assets/prodotti/product-090.jpg
+altCopertina: ''
 pesoGrammi: 107
-dimensioni: "5,5x9,5 cm"
+dimensioni: 5,5x9,5 cm
+materiale: cera
 stampoEsclusivo: true
-nota: "Dipinta a mano."
+estratto: ''
+nota: Dipinta a mano.
 ordine: 880
 paginaCatalogo: 40
 ---
-

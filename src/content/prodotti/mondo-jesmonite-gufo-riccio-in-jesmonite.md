@@ -1,13 +1,15 @@
 ---
-nome: "Gufo riccio in Jesmonite"
+nome: Gufo riccio in Jesmonite
 collezione: mondo-jesmonite
 prezzo: 10
-materiale: jesmonite
+copertina: /src/assets/prodotti/product-137.jpg
+altCopertina: ''
 pesoGrammi: 210
-dimensioni: "8 cm"
+dimensioni: 8 cm
+materiale: jesmonite
+estratto: ''
 personalizzabile: true
 profumabile: false
 ordine: 1310
 paginaCatalogo: 58
 ---
-
