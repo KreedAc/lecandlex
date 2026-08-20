@@ -1,5 +1,5 @@
 ---
-import { sito, linkWhatsApp, linkInstagram } from '../lib/sito';
+import { sito, linkWhatsApp, linkInstagram, prezziInGriglia } from '../lib/sito';
 
 const anno = new Date().getFullYear();
 ---
@@ -39,12 +39,24 @@ const anno = new Date().getFullYear();
     <div>
       <p class="occhiello">Buono a sapersi</p>
       <ul class="mt-4 space-y-2 text-sm text-fumo">
+        <!-- Il costo di spedizione e la soglia dell'omaggio sono numeri in
+             euro come gli altri: seguono lo stesso interruttore, altrimenti
+             restavano gli unici due prezzi visibili di tutto il sito. Le
+             informazioni che non sono cifre restano. -->
         <li>
-          Spedizione {sito.spedizione.costo}, tracciata, in {sito.spedizione.tempi.replace(', tracciata', '')}
+          {
+            prezziInGriglia
+              ? `Spedizione ${sito.spedizione.costo}, tracciata, in ${sito.spedizione.tempi.replace(', tracciata', '')}`
+              : `Spedizione tracciata, in ${sito.spedizione.tempi.replace(', tracciata', '')}`
+          }
         </li>
-        {sito.spedizione.gratisDa && <li>Gratis sopra {sito.spedizione.gratisDa}</li>}
+        {
+          prezziInGriglia && sito.spedizione.gratisDa && (
+            <li>Gratis sopra {sito.spedizione.gratisDa}</li>
+          )
+        }
         <li>Materiali 100% naturali, non testati sugli animali</li>
-        <li>Omaggio a sorpresa per ordini da {sito.omaggioDa} €</li>
+        {prezziInGriglia && <li>Omaggio a sorpresa per ordini da {sito.omaggioDa} €</li>}
         <li>Bomboniere con {sito.preavvisoBomboniereMesi} mesi di preavviso</li>
         <li>Refill delle candele in barattolo su richiesta</li>
       </ul>

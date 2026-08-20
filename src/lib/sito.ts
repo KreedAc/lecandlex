@@ -62,10 +62,15 @@ export const modoPrezzi: ModoPrezzi = modiPrezzi.includes(scelto as ModoPrezzi)
   ? (scelto as ModoPrezzi)
   : 'nascosti';
 
-/** Griglie, elenchi, intestazioni di collezione. */
+/**
+ * Se una cifra in euro puo' comparire nel testo del sito: griglie,
+ * intestazioni di collezione, tabella dei formati, costo di spedizione,
+ * soglia dell'omaggio. Vero solo a prezzi pubblici.
+ *
+ * Le due eccezioni sono la riga sotto il nome del prodotto e la foto a
+ * schermo intero, che hanno una regola loro qui sotto.
+ */
 export const prezziInGriglia = modoPrezzi === 'pubblici';
-/** Pagina del singolo prodotto. */
-export const prezziInScheda = modoPrezzi !== 'nascosti';
 
 type ConPrezzo = { prezzo?: number; varianti: { prezzo?: number }[] };
 
@@ -91,21 +96,60 @@ export function prezzoEsposto(p: ConPrezzo): string {
 }
 
 /**
- * Cosa scrivere al posto del prezzo in griglia.
+ * Il prezzo per la griglia, oppure niente.
  *
- * La riga resta anche quando il prezzo non si mostra: toglierla farebbe
- * finire i titoli delle card ad altezze diverse, e soprattutto non
- * direbbe a nessuno che il prezzo c'e', un clic piu' in la'.
+ * Quando non si mostra, la riga sparisce del tutto invece di lasciare al
+ * suo posto una scritta: nessun cartello che spieghi dove sia finito il
+ * numero. Le card restano allineate perche' la riga cade per tutte
+ * insieme, mai per una si' e una no.
  */
-export function prezzoInGriglia(p: ConPrezzo): string {
-  if (modoPrezzi === 'pubblici') return prezzoEsposto(p);
-  if (modoPrezzi === 'solo-scheda') return 'Vedi il prezzo';
-  return 'Prezzo su richiesta';
+export function prezzoInGriglia(p: ConPrezzo): string | null {
+  return prezziInGriglia ? prezzoEsposto(p) : null;
 }
 
-/** Cosa scrivere nella scheda del prodotto. */
-export function prezzoInScheda(p: ConPrezzo): string {
-  return prezziInScheda ? prezzoEsposto(p) : 'Prezzo su richiesta';
+/**
+ * Il prezzo sotto il nome del prodotto, oppure niente.
+ *
+ * A `solo-scheda` non compare qui: sta nella foto a schermo intero, che si
+ * apre toccando l'immagine. A `nascosti` resta "Prezzo su richiesta", che
+ * e' l'unico modo onesto di dire che un prezzo esiste ma non si pubblica.
+ */
+export function prezzoSottoIlNome(p: ConPrezzo): string | null {
+  if (modoPrezzi === 'pubblici') return prezzoEsposto(p);
+  if (modoPrezzi === 'nascosti') return 'Prezzo su richiesta';
+  return null;
+}
+
+/** Il prezzo dentro la foto a schermo intero. Solo dove serve davvero. */
+export function prezzoNellaFoto(p: ConPrezzo): string | null {
+  return modoPrezzi === 'solo-scheda' ? prezzoEsposto(p) : null;
+}
+
+/** Una cifra in euro scritta in mezzo a una frase: "15 €", "€ 15", "15 euro". */
+const cifraInEuro = /(?:€\s*\d|\d[\d.,]*\s*(?:€|eur(?:o|os)?\b))/i;
+
+/**
+ * La nota del prodotto, senza le frasi che contengono un prezzo.
+ *
+ * La nota e' testo libero: "Con piattino 3,50 €", "La coppia 20 €". Sono
+ * prezzi a tutti gli effetti, e nessun interruttore sui campi numerici li
+ * avrebbe intercettati. Si tolgono a frasi intere invece che a parole,
+ * cosi' quello che resta e' ancora italiano: da "La coppia 15 €. Alberello
+ * da 25 g." sopravvive la seconda meta', che non parla di soldi.
+ *
+ * Vale anche per quello che verra' scritto domani: se il prezzo torna
+ * dentro una nota mentre i prezzi sono spenti, sparisce da solo.
+ */
+export function notaVisibile(nota?: string): string | undefined {
+  if (!nota || prezziInGriglia) return nota;
+
+  const rimaste = nota
+    .split(/(?<=[.!?])\s+/)
+    .filter((frase) => !cifraInEuro.test(frase))
+    .join(' ')
+    .trim();
+
+  return rimaste === '' ? undefined : rimaste;
 }
 
 /** Il prezzo piu' basso, per i dati strutturati. Undefined se non c'e'. */

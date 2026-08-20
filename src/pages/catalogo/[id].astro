@@ -8,9 +8,11 @@ import segnaposto from '../../assets/segnaposto.jpg';
 import {
   sito,
   prezzo,
-  prezzoInScheda,
+  prezzoSottoIlNome,
+  prezzoNellaFoto,
+  notaVisibile,
   prezzoMinimo,
-  prezziInScheda,
+  prezziInGriglia,
   modoPrezzi,
   messaggioProdotto,
   etichettaMateriale,
@@ -55,6 +57,9 @@ const scheda = [
 ].filter((r): r is [string, string] => r !== null);
 
 const minimo = prezzoMinimo(d);
+const sottoIlNome = prezzoSottoIlNome(d);
+const nellaFoto = prezzoNellaFoto(d);
+const nota = notaVisibile(d.nota);
 
 const datiStrutturati = {
   '@context': 'https://schema.org',
@@ -111,26 +116,43 @@ const datiStrutturati = {
   </div>
 
   <article class="contenitore grid gap-10 pb-14 lg:grid-cols-2 lg:gap-16">
+    <!-- Le foto si aprono a schermo intero toccandole. Nessuna scritta lo
+         annuncia: lo dice il cursore a lente su desktop, e sul telefono e'
+         il gesto che si prova comunque su una foto grande. -->
     <div class="space-y-4">
-      <Image
-        src={foto}
-        alt={descrizioneFoto}
-        widths={[500, 800, 1200]}
-        sizes="(min-width: 1024px) 34rem, 92vw"
-        loading="eager"
-        fetchpriority="high"
-        class="w-full rounded-xl bg-sabbia object-cover"
-      />
+      <button
+        type="button"
+        data-apri-foto
+        aria-label={`Apri la foto di ${d.nome}`}
+        class="block w-full cursor-zoom-in rounded-xl"
+      >
+        <Image
+          src={foto}
+          alt={descrizioneFoto}
+          widths={[500, 800, 1200, 1600]}
+          sizes="(min-width: 1024px) 34rem, 92vw"
+          loading="eager"
+          fetchpriority="high"
+          class="w-full rounded-xl bg-sabbia object-cover"
+        />
+      </button>
       {
         galleria.map((f) => (
-          <Image
-            src={f.file!}
-            alt={f.alt ?? d.nome}
-            widths={[500, 800, 1200]}
-            sizes="(min-width: 1024px) 34rem, 92vw"
-            loading="lazy"
-            class="w-full rounded-xl bg-sabbia object-cover"
-          />
+          <button
+            type="button"
+            data-apri-foto
+            aria-label={`Apri la foto di ${f.alt ?? d.nome}`}
+            class="block w-full cursor-zoom-in rounded-xl"
+          >
+            <Image
+              src={f.file!}
+              alt={f.alt ?? d.nome}
+              widths={[500, 800, 1200, 1600]}
+              sizes="(min-width: 1024px) 34rem, 92vw"
+              loading="lazy"
+              class="w-full rounded-xl bg-sabbia object-cover"
+            />
+          </button>
         ))
       }
     </div>
@@ -138,7 +160,7 @@ const datiStrutturati = {
     <div class="lg:sticky lg:top-24 lg:self-start">
       {collezione && <p class="occhiello">{collezione.data.nome}</p>}
       <h1 class="mt-3 text-4xl sm:text-5xl">{d.nome}</h1>
-      <p class="mt-4 text-2xl">{prezzoInScheda(d)}</p>
+      {sottoIlNome && <p class="mt-4 text-2xl">{sottoIlNome}</p>}
 
       {
         d.stampoEsclusivo && (
@@ -160,7 +182,7 @@ const datiStrutturati = {
         {d.disponibile ? 'Disponibile' : 'Non disponibile al momento'}
       </p>
 
-      {d.nota && <p class="mt-3 text-sm text-fumo">{d.nota}</p>}
+      {nota && <p class="mt-3 text-sm text-fumo">{nota}</p>}
 
       {
         d.varianti.length > 0 && (
@@ -175,9 +197,14 @@ const datiStrutturati = {
                       .filter(Boolean)
                       .join(' · ')}
                   </span>
-                  <span class="font-medium">
-                    {prezziInScheda && v.prezzo !== undefined ? prezzo(v.prezzo) : 'su richiesta'}
-                  </span>
+                  {/* La colonna dei prezzi sparisce tutta insieme: lasciare
+                      "su richiesta" ripetuto su ogni riga sarebbe un modo
+                      goffo di segnalare proprio quello che non si mostra. */}
+                  {prezziInGriglia && (
+                    <span class="font-medium">
+                      {v.prezzo !== undefined ? prezzo(v.prezzo) : 'su richiesta'}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
@@ -247,6 +274,95 @@ const datiStrutturati = {
       </section>
     )
   }
+
+  <!-- La foto a schermo intero. Vive fuori dall'articolo perche' copre
+       tutta la pagina, intestazione compresa. -->
+  <dialog
+    data-foto-intera
+    aria-label={d.nome}
+    class="m-0 h-dvh max-h-none w-full max-w-none bg-transparent p-0 backdrop:bg-inchiostro/[0.97]"
+  >
+    <div class="flex h-full w-full items-center justify-center p-4 sm:p-8">
+      <figure class="flex flex-col items-center gap-5">
+        <div data-posto-foto class="flex justify-center"></div>
+        {
+          nellaFoto && (
+            <figcaption class="text-3xl text-crema tabular-nums sm:text-4xl">{nellaFoto}</figcaption>
+          )
+        }
+      </figure>
+    </div>
+    <button
+      type="button"
+      aria-label="Chiudi"
+      class="absolute top-3 right-3 flex h-11 w-11 items-center justify-center rounded-full bg-crema/15 text-2xl leading-none text-crema transition-colors hover:bg-crema/25"
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+  </dialog>
+
+  <script>
+    {
+      /**
+       * Apre la foto del prodotto a schermo intero.
+       *
+       * Usa <dialog> nativo invece di costruire un pannello a mano: da
+       * solo gestisce Esc, il fondo scuro, e il fatto che il resto della
+       * pagina non si possa piu' toccare finche' e' aperto.
+       *
+       * L'immagine non viene duplicata nel documento: si copia al volo
+       * quella su cui si e' premuto, con tutte le sue misure gia'
+       * ottimizzate. Cosi' la pagina non pesa di piu' per una cosa che
+       * quasi sempre non viene aperta.
+       */
+      const finestra = document.querySelector<HTMLDialogElement>('[data-foto-intera]');
+      const posto = finestra?.querySelector('[data-posto-foto]');
+
+      if (finestra && posto) {
+        const apri = (immagine: HTMLImageElement) => {
+          const copia = immagine.cloneNode() as HTMLImageElement;
+
+          // Le classi e lo stile della griglia servono a stare dentro una
+          // colonna: qui darebbero fastidio. Si riparte da zero.
+          copia.removeAttribute('data-astro-image');
+          copia.removeAttribute('class');
+          copia.removeAttribute('style');
+          copia.sizes = '100vw';
+          copia.loading = 'eager';
+          // L'altezza e' legata alla finestra e non al contenitore: sotto
+          // c'e' il prezzo, e deve restare fuori dalla foto anche su uno
+          // schermo basso o con la tastiera aperta.
+          Object.assign(copia.style, {
+            maxWidth: '100%',
+            maxHeight: '76dvh',
+            width: 'auto',
+            height: 'auto',
+            objectFit: 'contain',
+            borderRadius: '0.5rem',
+          });
+
+          posto.replaceChildren(copia);
+          finestra.showModal();
+          document.documentElement.style.overflow = 'hidden';
+        };
+
+        for (const bottone of document.querySelectorAll('[data-apri-foto]')) {
+          bottone.addEventListener('click', () => {
+            const immagine = bottone.querySelector('img');
+            if (immagine) apri(immagine);
+          });
+        }
+
+        // Un tocco in qualunque punto richiude. E' il gesto che si prova
+        // per primo, e mirare la crocetta su un telefono e' scomodo.
+        finestra.addEventListener('click', () => finestra.close());
+        finestra.addEventListener('close', () => {
+          document.documentElement.style.overflow = '';
+          posto.replaceChildren();
+        });
+      }
+    }
+  </script>
 
   <script type="application/ld+json" set:html={JSON.stringify(datiStrutturati)} is:inline />
 </Base>

@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import BottoneWhatsApp from '../components/BottoneWhatsApp.astro';
-import { sito, linkInstagram } from '../lib/sito';
+import { sito, linkInstagram, prezziInGriglia } from '../lib/sito';
 
 const faq = [
   {
@@ -10,8 +10,21 @@ const faq = [
       'Scrivimi su WhatsApp o su Instagram dicendomi cosa ti interessa. Ti confermo disponibilità e totale, e ti mando i dettagli per il pagamento. Non c’è un carrello: preferisco parlare con chi compra.',
   },
   {
-    domanda: 'Quanto costa la spedizione e quanto ci mette?',
-    risposta: `La spedizione parte da ${sito.spedizione.costo.replace('da ', '')}, è rapida e tracciata, e arriva in ${sito.spedizione.tempi.replace(', tracciata', '')}.${sito.spedizione.ritiroInPersona ? ' Se sei in zona puoi anche ritirare di persona e risparmiarla.' : ''}`,
+    // Con i prezzi spenti la domanda cambia: chiedere "quanto costa" e
+    // rispondere senza dire quanto sarebbe una presa in giro. Resta la
+    // parte che si puo' rispondere davvero, cioe' i tempi.
+    domanda: prezziInGriglia
+      ? 'Quanto costa la spedizione e quanto ci mette?'
+      : 'Come funziona la spedizione?',
+    risposta: `${
+      prezziInGriglia
+        ? `La spedizione parte da ${sito.spedizione.costo.replace('da ', '')}, è rapida e tracciata`
+        : 'La spedizione è rapida e tracciata'
+    }, e arriva in ${sito.spedizione.tempi.replace(', tracciata', '')}.${
+      sito.spedizione.ritiroInPersona
+        ? ' Se sei in zona puoi anche ritirare di persona e risparmiarla.'
+        : ''
+    }`,
   },
   {
     domanda: 'Posso scegliere la fragranza?',
@@ -34,7 +47,9 @@ const faq = [
   },
   {
     domanda: 'C’è un minimo d’ordine?',
-    risposta: `No. Però per ordini uguali o superiori a ${sito.omaggioDa} € c’è un omaggio a sorpresa.`,
+    risposta: prezziInGriglia
+      ? `No. Però per ordini uguali o superiori a ${sito.omaggioDa} € c’è un omaggio a sorpresa.`
+      : 'No, nessun minimo. Puoi ordinare anche un pezzo solo.',
   },
   {
     domanda: 'Un pezzo non è disponibile, quando torna?',

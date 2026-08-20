@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import { prezzoInGriglia, prezziInGriglia } from '../lib/sito';
+import { prezzoInGriglia } from '../lib/sito';
 import segnaposto from '../assets/segnaposto.jpg';
 
 interface Props {
@@ -19,6 +19,7 @@ const descrizioneFoto = d.altCopertina ?? d.nome;
 const dettagli = [d.dimensioni, d.pesoGrammi ? `${d.pesoGrammi} g` : null]
   .filter(Boolean)
   .join(' · ');
+const daMostrare = prezzoInGriglia(d);
 ---
 
 <article>
@@ -57,14 +58,7 @@ const dettagli = [d.dimensioni, d.pesoGrammi ? `${d.pesoGrammi} g` : null]
         {d.nome}
       </h3>
       {dettagli && <p class="mt-1 text-xs text-fumo tabular-nums">{dettagli}</p>}
-      <p
-        class:list={[
-          'mt-2 text-sm tabular-nums',
-          prezziInGriglia ? 'font-medium' : 'text-fumo',
-        ]}
-      >
-        {prezzoInGriglia(d)}
-      </p>
+      {daMostrare && <p class="mt-2 text-sm font-medium tabular-nums">{daMostrare}</p>}
     </div>
   </a>
 </article>
