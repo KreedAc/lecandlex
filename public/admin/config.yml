@@ -250,6 +250,15 @@ collections:
             hint: Senza la chiocciola. Attenzione agli underscore - controlla che sia identico al tuo profilo.
           - { name: facebook, label: Pagina Facebook, widget: string }
           - { name: citta, label: Città o zona, widget: string }
+          - name: prezzi
+            label: Dove mostrare i prezzi
+            widget: select
+            default: solo-scheda
+            options:
+              - { label: 'Ovunque, anche nel catalogo', value: pubblici }
+              - { label: 'Solo aprendo il prodotto', value: solo-scheda }
+              - { label: 'In nessun posto', value: nascosti }
+            hint: Vale per tutto il sito. Se il campo resta vuoto i prezzi non si vedono da nessuna parte.
           - { name: omaggioDa, label: Omaggio a partire da (euro), widget: number, value_type: int }
           - { name: preavvisoBomboniereMesi, label: Preavviso bomboniere (mesi), widget: number, value_type: int }
           - { name: stagionaturaGiorni, label: Giorni di stagionatura, widget: number, value_type: int }

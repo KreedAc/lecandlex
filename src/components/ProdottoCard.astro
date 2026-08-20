@@ -1,7 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
-import { prezzoEsposto } from '../lib/sito';
+import { prezzoInGriglia, prezziInGriglia } from '../lib/sito';
 import segnaposto from '../assets/segnaposto.jpg';
 
 interface Props {
@@ -57,7 +57,14 @@ const dettagli = [d.dimensioni, d.pesoGrammi ? `${d.pesoGrammi} g` : null]
         {d.nome}
       </h3>
       {dettagli && <p class="mt-1 text-xs text-fumo tabular-nums">{dettagli}</p>}
-      <p class="mt-2 text-sm font-medium tabular-nums">{prezzoEsposto(d)}</p>
+      <p
+        class:list={[
+          'mt-2 text-sm tabular-nums',
+          prezziInGriglia ? 'font-medium' : 'text-fumo',
+        ]}
+      >
+        {prezzoInGriglia(d)}
+      </p>
     </div>
   </a>
 </article>

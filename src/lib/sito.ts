@@ -39,6 +39,34 @@ export function prezzo(valore: number): string {
   }).format(valore);
 }
 
+/**
+ * Dove il sito puo' mostrare i prezzi.
+ *
+ * `pubblici`    — ovunque, come in un catalogo normale.
+ * `solo-scheda` — non nelle griglie; solo aprendo il singolo prodotto.
+ * `nascosti`    — mai: ovunque si legge "Prezzo su richiesta".
+ *
+ * Sta in sito.json e non nel codice perche' e' una scelta destinata a
+ * cambiare: si sposta dal pannello, come tutto il resto.
+ *
+ * Un valore non riconosciuto — campo svuotato per sbaglio, refuso —
+ * ricade su `nascosti`. Fra i due modi di sbagliare, un prezzo che non
+ * si vede si nota e si sistema; uno che compare quando non doveva, no.
+ */
+export type ModoPrezzi = 'pubblici' | 'solo-scheda' | 'nascosti';
+
+const modiPrezzi: readonly ModoPrezzi[] = ['pubblici', 'solo-scheda', 'nascosti'];
+
+const scelto = (sito as { prezzi?: string }).prezzi;
+export const modoPrezzi: ModoPrezzi = modiPrezzi.includes(scelto as ModoPrezzi)
+  ? (scelto as ModoPrezzi)
+  : 'nascosti';
+
+/** Griglie, elenchi, intestazioni di collezione. */
+export const prezziInGriglia = modoPrezzi === 'pubblici';
+/** Pagina del singolo prodotto. */
+export const prezziInScheda = modoPrezzi !== 'nascosti';
+
 type ConPrezzo = { prezzo?: number; varianti: { prezzo?: number }[] };
 
 /**
@@ -60,6 +88,24 @@ export function prezzoEsposto(p: ConPrezzo): string {
   }
   if (typeof p.prezzo === 'number') return prezzo(p.prezzo);
   return 'Prezzo su richiesta';
+}
+
+/**
+ * Cosa scrivere al posto del prezzo in griglia.
+ *
+ * La riga resta anche quando il prezzo non si mostra: toglierla farebbe
+ * finire i titoli delle card ad altezze diverse, e soprattutto non
+ * direbbe a nessuno che il prezzo c'e', un clic piu' in la'.
+ */
+export function prezzoInGriglia(p: ConPrezzo): string {
+  if (modoPrezzi === 'pubblici') return prezzoEsposto(p);
+  if (modoPrezzi === 'solo-scheda') return 'Vedi il prezzo';
+  return 'Prezzo su richiesta';
+}
+
+/** Cosa scrivere nella scheda del prodotto. */
+export function prezzoInScheda(p: ConPrezzo): string {
+  return prezziInScheda ? prezzoEsposto(p) : 'Prezzo su richiesta';
 }
 
 /** Il prezzo piu' basso, per i dati strutturati. Undefined se non c'e'. */

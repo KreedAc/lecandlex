@@ -4,7 +4,7 @@ import Base from '../../layouts/Base.astro';
 import NavCollezioni from '../../components/NavCollezioni.astro';
 import ProdottoCard from '../../components/ProdottoCard.astro';
 import BottoneWhatsApp from '../../components/BottoneWhatsApp.astro';
-import { prezzo } from '../../lib/sito';
+import { prezzo, prezziInGriglia } from '../../lib/sito';
 
 const prodotti = await getCollection('prodotti');
 const collezioni = (await getCollection('collezioni')).sort(
@@ -70,7 +70,7 @@ let contatoreImmagini = 0;
             <h2 class="text-2xl sm:text-3xl">{collezione.data.nome}</h2>
             <p class="text-sm text-fumo tabular-nums">
               {elenco.length} {elenco.length === 1 ? 'pezzo' : 'pezzi'}
-              {da !== undefined && ` · da ${prezzo(da)}`}
+              {prezziInGriglia && da !== undefined && ` · da ${prezzo(da)}`}
               {esclusivi > 0 && ` · ${esclusivi} a stampo esclusivo`}
             </p>
           </div>

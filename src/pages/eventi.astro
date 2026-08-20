@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import BottoneWhatsApp from '../components/BottoneWhatsApp.astro';
-import { sito } from '../lib/sito';
+import { sito, prezziInGriglia } from '../lib/sito';
 
 const passi = [
   {
@@ -71,8 +71,15 @@ const passi = [
           <span class="text-fiamma" aria-hidden="true">•</span> Scritta personalizzata
         </li>
       </ul>
+      <!-- Un prezzo scritto a mano dentro la pagina: sfugge alla griglia,
+           quindi va spento dallo stesso interruttore, altrimenti resta
+           l'unico numero visibile di tutto il sito. -->
       <p class="mt-6 text-sm text-fumo">
-        Per dare un'idea: un bouquet nascita o Natale da 12 cm di diametro costa 35 €.
+        {
+          prezziInGriglia
+            ? "Per dare un'idea: un bouquet nascita o Natale da 12 cm di diametro costa 35 €."
+            : 'Il preventivo è gratuito: scrivimi la misura e il tema e ti dico subito quanto viene.'
+        }
       </p>
       <div class="mt-7">
         <BottoneWhatsApp

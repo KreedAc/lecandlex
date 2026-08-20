@@ -1,6 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
-import { sito } from '../lib/sito';
+import { sito, modoPrezzi } from '../lib/sito';
+
+// Come si comporta il sito adesso, detto con parole sue. La guida legge
+// l'impostazione vera invece di descriverne una fissa: se qualcuno cambia
+// l'interruttore, la guida cambia con lui e non resta a raccontare una
+// cosa che non e' piu' vera.
+const statoPrezzi = {
+  pubblici: 'ora i prezzi si vedono ovunque, catalogo compreso',
+  'solo-scheda': 'ora nel catalogo non si vedono: compaiono solo aprendo il singolo prodotto',
+  nascosti: 'ora non si vedono da nessuna parte: ovunque compare «Prezzo su richiesta»',
+}[modoPrezzi];
 
 // Pagina di servizio per chi aggiorna il sito. Non e' nel menu e non va
 // indicizzata, ma resta sempre raggiungibile da /guida: un link salvato
@@ -70,6 +80,16 @@ const grassetto = (t: string) => t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong
     <p class="mt-2 leading-relaxed text-fumo">
       Prodotti → cerchi il pezzo → cambi il numero in «Prezzo in euro» → Pubblica. Solo il numero,
       senza il simbolo €.
+    </p>
+
+    <h3 class="mt-6 text-lg font-medium">Mostrare o nascondere i prezzi</h3>
+    <p class="mt-2 leading-relaxed text-fumo">
+      Impostazioni → Contatti e frasi del sito → «Dove mostrare i prezzi». Tre scelte: ovunque, solo
+      aprendo il prodotto, oppure in nessun posto. Vale per tutto il sito in un colpo solo, e {statoPrezzi}.
+    </p>
+    <p class="mt-2 leading-relaxed text-fumo">
+      I prezzi dei prodotti restano scritti dove sono anche quando non si vedono: è solo una tenda
+      che si apre e si chiude, non li stai cancellando.
     </p>
 
     <h3 class="mt-6 text-lg font-medium">Segnare che un pezzo è finito</h3>

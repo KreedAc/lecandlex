@@ -8,8 +8,10 @@ import segnaposto from '../../assets/segnaposto.jpg';
 import {
   sito,
   prezzo,
-  prezzoEsposto,
+  prezzoInScheda,
   prezzoMinimo,
+  prezziInScheda,
+  modoPrezzi,
   messaggioProdotto,
   etichettaMateriale,
 } from '../../lib/sito';
@@ -61,17 +63,24 @@ const datiStrutturati = {
   description: d.estratto ?? `${d.nome} — ${collezione?.data.nome ?? sito.nome}`,
   image: new URL(foto.src, Astro.site).href,
   brand: { '@type': 'Brand', name: sito.nome },
-  // Senza prezzo non dichiariamo un'offerta: meglio nessun dato che un
-  // prezzo sbagliato nei risultati di ricerca.
-  ...(minimo !== undefined && {
-    offers: {
-      '@type': 'Offer',
-      price: minimo,
-      priceCurrency: 'EUR',
-      availability: d.disponibile ? 'https://schema.org/InStock' : 'https://schema.org/BackOrder',
-      url: new URL(Astro.url.pathname, Astro.site).href,
-    },
-  }),
+  // L'offerta si dichiara solo a prezzi pubblici. Non basta toglierli
+  // dalla pagina: questi dati finiscono nei risultati di ricerca, e Google
+  // li stamperebbe accanto al link — cioe' di nuovo dentro un elenco.
+  //
+  // E senza prezzo non dichiariamo nessuna offerta: meglio un dato in meno
+  // che un prezzo sbagliato in vetrina su Google.
+  ...(modoPrezzi === 'pubblici' &&
+    minimo !== undefined && {
+      offers: {
+        '@type': 'Offer',
+        price: minimo,
+        priceCurrency: 'EUR',
+        availability: d.disponibile
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/BackOrder',
+        url: new URL(Astro.url.pathname, Astro.site).href,
+      },
+    }),
 };
 ---
 
@@ -129,7 +138,7 @@ const datiStrutturati = {
     <div class="lg:sticky lg:top-24 lg:self-start">
       {collezione && <p class="occhiello">{collezione.data.nome}</p>}
       <h1 class="mt-3 text-4xl sm:text-5xl">{d.nome}</h1>
-      <p class="mt-4 text-2xl">{prezzoEsposto(d)}</p>
+      <p class="mt-4 text-2xl">{prezzoInScheda(d)}</p>
 
       {
         d.stampoEsclusivo && (
@@ -167,7 +176,7 @@ const datiStrutturati = {
                       .join(' · ')}
                   </span>
                   <span class="font-medium">
-                    {v.prezzo !== undefined ? prezzo(v.prezzo) : 'su richiesta'}
+                    {prezziInScheda && v.prezzo !== undefined ? prezzo(v.prezzo) : 'su richiesta'}
                   </span>
                 </li>
               ))}
