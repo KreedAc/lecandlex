@@ -1,12 +1,15 @@
 ---
 nome: Dolce Cuore
 collezione: infinity
-prezzo: null
+prezzo: 3
 copertina: /src/assets/prodotti/product-010.jpg
 altCopertina: ''
+disponibile: true
 pesoGrammi: null
 dimensioni: ''
 materiale: cera
+stampoEsclusivo: false
+inEvidenza: false
 estratto: ''
 varianti:
   - nome: Grande
@@ -17,6 +20,9 @@ varianti:
     prezzo: 3
     pesoGrammi: 20
     dimensioni: 4,5x4 cm
+galleria: []
+personalizzabile: true
+profumabile: true
 nota: ''
 ordine: 10
 paginaCatalogo: 9
