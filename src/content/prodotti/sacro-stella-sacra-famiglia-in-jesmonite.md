@@ -1,5 +1,5 @@
 ---
-nome: Stella Sacra Famiglia in Jesmonite
+nome: Stella Sacra Famiglia
 collezione: mondo-jesmonite
 prezzo: 10
 copertina: /src/assets/prodotti/product-121.jpg
