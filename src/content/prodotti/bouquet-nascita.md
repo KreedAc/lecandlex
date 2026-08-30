@@ -1,5 +1,5 @@
 ---
-nome: Bouquet Nascita
+nome: Bouquet Nascita Bimbo
 collezione: bouquet
 prezzo: 35
 copertina: /src/assets/prodotti/IMG_7512.jpeg
