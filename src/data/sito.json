@@ -2,7 +2,7 @@
   "nome": "Le CandLex",
   "sottotitolo": "Candele | Arredo | Eventi",
   "claim": "Accendi un sogno e lascialo bruciare in te",
-  "descrizione": "Candele scultura e complementi d'arredo in ceramica, fatti a mano con materiali 100% naturali e non testati sugli animali. Bomboniere e composizioni personalizzate.",
+  "descrizione": "Candele scultoree e complementi d'arredo in ceramica, fatti a mano con materiali 100% naturali e non testati sugli animali. Bomboniere e composizioni personalizzate.",
   "titolare": "Alessia Vanni",
   "email": "lecandlexart@gmail.com",
   "whatsapp": "393459190403",
@@ -16,7 +16,7 @@
   "stagionaturaGiorni": 5,
   "spedizione": {
     "costo": "da 9 €",
-    "gratisDa": "",
+    "gratisDa": "80€",
     "tempi": "48 ore, tracciata",
     "ritiroInPersona": true
   }
