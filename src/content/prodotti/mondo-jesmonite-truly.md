@@ -1,7 +1,7 @@
 ---
 nome: Truly Love
 collezione: mondo-jesmonite
-prezzo: 5.5
+prezzo: 5
 copertina: /src/assets/prodotti/product-155.jpg
 altCopertina: ''
 disponibile: true
