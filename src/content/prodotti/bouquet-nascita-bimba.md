@@ -9,7 +9,7 @@ pesoGrammi: null
 dimensioni: ''
 materiale: cera
 stampoEsclusivo: false
-inEvidenza: true
+inEvidenza: false
 estratto: ''
 varianti: []
 galleria: []
