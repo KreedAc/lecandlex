@@ -9,7 +9,7 @@ pesoGrammi: null
 dimensioni: 13,5x7,5 cm
 materiale: ceramica
 stampoEsclusivo: false
-inEvidenza: false
+inEvidenza: true
 estratto: ''
 varianti: []
 galleria:
