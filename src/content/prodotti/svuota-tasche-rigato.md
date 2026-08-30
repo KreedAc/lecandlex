@@ -1,5 +1,5 @@
 ---
-nome: Svuota tasche rigato
+nome: Sole a righe
 collezione: mondo-jesmonite
 prezzo: 15
 copertina: /src/assets/prodotti/IMG_6424.jpeg
