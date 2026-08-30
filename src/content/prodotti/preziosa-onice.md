@@ -14,7 +14,7 @@ estratto: Con pietre di onice e fragranza fiori d'arancio. Per la concentrazione
 varianti: []
 galleria: []
 personalizzabile: false
-profumabile: true
+profumabile: false
 nota: ''
 ordine: 1
 paginaCatalogo: 6
