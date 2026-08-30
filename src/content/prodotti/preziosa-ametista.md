@@ -14,7 +14,7 @@ estratto: Con ametista e fragranza iris e lavanda. Un augurio alla pace interior
 varianti: []
 galleria: []
 personalizzabile: false
-profumabile: true
+profumabile: false
 nota: ''
 ordine: 3
 paginaCatalogo: 6
