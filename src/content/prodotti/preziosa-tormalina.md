@@ -4,13 +4,20 @@ collezione: preziosa
 prezzo: 9
 copertina: /src/assets/prodotti/preziosa-tormalina.jpg
 altCopertina: Candela in latta dorata con pietre di tormalina nera sulla cera, accanto a due grezzi di tormalina
-materiale: cera
+disponibile: true
 pesoGrammi: 80
+dimensioni: ''
+materiale: cera
 stampoEsclusivo: false
-inEvidenza: true
+inEvidenza: false
+estratto: Con pietre di tormalina nera e fragranza tabacco e miele di fiori. Protettiva.
+varianti: []
+galleria: []
+personalizzabile: false
+profumabile: true
+nota: ''
 ordine: 2
 paginaCatalogo: 6
-estratto: Con pietre di tormalina nera e fragranza tabacco e miele di fiori. Protettiva.
 ---
 
 Le pietre di Tormalina nera vengono utilizzate per alleviare gli attacchi di
