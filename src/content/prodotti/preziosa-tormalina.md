@@ -14,7 +14,7 @@ estratto: Con pietre di tormalina nera e fragranza tabacco e miele di fiori. Pro
 varianti: []
 galleria: []
 personalizzabile: false
-profumabile: true
+profumabile: false
 nota: ''
 ordine: 2
 paginaCatalogo: 6
