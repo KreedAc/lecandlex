@@ -12,9 +12,7 @@ stampoEsclusivo: false
 inEvidenza: true
 estratto: ''
 varianti: []
-galleria:
-  - file: /src/assets/prodotti/IMG_0980.jpeg
-    alt: ''
+galleria: []
 personalizzabile: false
 profumabile: true
 nota: ''
