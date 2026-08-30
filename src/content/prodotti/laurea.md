@@ -1,5 +1,5 @@
 ---
-nome: Laurea
+nome: Tulipani
 collezione: servizio-bomboniere
 prezzo: null
 copertina: /src/assets/prodotti/IMG_5258.jpeg
