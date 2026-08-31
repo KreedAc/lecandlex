@@ -60,6 +60,40 @@ function fotoDelSitoOppure(percorso: unknown, ripiego: ImageMetadata): ImageMeta
 export const ritratto = fotoDelSitoOppure((sito as { ritratto?: string }).ritratto, segnaposto);
 
 /**
+ * La foto di sfondo, dietro tutte le pagine. Se non c'e', non c'e': lo
+ * sfondo resta il colore pieno di sempre, che e' anche il ripiego se il
+ * percorso e' sbagliato.
+ */
+export const sfondo: ImageMetadata | null = (() => {
+  const percorso = (sito as { sfondo?: string }).sfondo;
+  if (typeof percorso !== 'string' || percorso.trim() === '') return null;
+  return fotoDelSito[percorso.trim()]?.default ?? null;
+})();
+
+/**
+ * Quanto copre il velo di colore steso sopra la foto.
+ *
+ * I tre valori non sono scelti a occhio. Il caso peggiore non e' la foto
+ * che c'e' adesso: e' una foto tutta nera, il fondo piu' scuro che possa
+ * capitare sotto. Misurato il contrasto di ogni colore di testo contro
+ * quel fondo, il vincolo e' l'arancione dei link — regge fino al 94% e
+ * sotto scende oltre la soglia di leggibilita'.
+ *
+ *   98%  link 5,05:1   testo 6,15:1
+ *   96%  link 4,80:1   testo 5,81:1
+ *   94%  link 4,59:1   testo 5,55:1   <- il minimo che si puo' tenere
+ *   92%  link 4,39:1                  <- sotto soglia, fuori scelta
+ *
+ * Per questo dal pannello si sceglie fra tre gradini e non con una
+ * manopola libera: qualunque cosa scelga Alessia, il testo resta
+ * leggibile. Un valore non riconosciuto ricade sul piu' coperto.
+ */
+const veli = { appena: 0.98, media: 0.96, visibile: 0.94 } as const;
+
+export const veloSfondo: number =
+  veli[(sito as { sfondoVelo?: keyof typeof veli }).sfondoVelo as keyof typeof veli] ?? veli.appena;
+
+/**
  * Costruisce un link WhatsApp con il messaggio gia' scritto.
  *
  * E' il pezzo che fa la differenza rispetto a un "contattaci": chi clicca

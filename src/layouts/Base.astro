@@ -1,8 +1,9 @@
 ---
+import { Image } from 'astro:assets';
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import { sito } from '../lib/sito';
+import { sito, sfondo, veloSfondo } from '../lib/sito';
 
 interface Props {
   titolo: string;
@@ -44,6 +45,32 @@ const anteprima = immagine ? new URL(immagine, Astro.site).href : undefined;
   </head>
 
   <body>
+    {/* La foto di sfondo, dietro tutto e ferma mentre si scorre.
+        `background-attachment: fixed` farebbe la stessa cosa in una riga,
+        ma su iPhone singhiozza: meglio un riquadro fisso vero.
+
+        Sopra ci sta il colore di sempre, reso trasparente quel tanto che
+        basta a far trasparire la foto senza rendere faticoso il testo —
+        di quanto esattamente lo decide `veloSfondo`, che porta con se' i
+        conti sul contrasto. Il colore pieno del `body` resta sotto: se la
+        foto non arriva, la pagina e' quella di prima. */}
+    {
+      sfondo && (
+        <div class="pointer-events-none fixed inset-0 -z-10" aria-hidden="true">
+          <Image
+            src={sfondo}
+            alt=""
+            widths={[900, 1500, 2200]}
+            sizes="100vw"
+            loading="eager"
+            fetchpriority="low"
+            class="h-full w-full object-cover"
+          />
+          <div class="absolute inset-0 bg-crema" style={`opacity:${veloSfondo}`} />
+        </div>
+      )
+    }
+
     <a
       href="#contenuto"
       class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-inchiostro focus:px-5 focus:py-2.5 focus:text-sm focus:text-crema"

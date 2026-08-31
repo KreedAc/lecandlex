@@ -260,6 +260,22 @@ collections:
             media_folder: /src/assets/sito
             public_folder: /src/assets/sito
             hint: Compare nella pagina "Chi sono" e in fondo alla prima pagina. Viene ritagliata verticale, quindi meglio una foto in piedi o quadrata.
+          - name: sfondo
+            label: Foto di sfondo del sito
+            widget: image
+            required: false
+            media_folder: /src/assets/sito
+            public_folder: /src/assets/sito
+            hint: Sta dietro a tutte le pagine, sbiadita. Meglio orizzontale, grande e chiara. Se la togli torna lo sfondo a tinta unita.
+          - name: sfondoVelo
+            label: Quanto si vede lo sfondo
+            widget: select
+            default: appena
+            options:
+              - { label: 'Appena accennato', value: appena }
+              - { label: 'Più marcato', value: media }
+              - { label: 'Il massimo leggibile', value: visibile }
+            hint: Più di così la foto coprirebbe il testo. Le tre scelte sono tutte sicure, qualunque foto tu metta.
           - name: prezzi
             label: Dove mostrare i prezzi
             widget: select
