@@ -250,6 +250,16 @@ collections:
             hint: Senza la chiocciola. Attenzione agli underscore - controlla che sia identico al tuo profilo.
           - { name: facebook, label: Pagina Facebook, widget: string }
           - { name: citta, label: Città o zona, widget: string }
+          # Le foto del sito stanno in una cartella loro: cosi' scegliendo
+          # questa non ti si apre la libreria con dentro tutte le foto dei
+          # prodotti.
+          - name: ritratto
+            label: La tua foto
+            widget: image
+            required: false
+            media_folder: /src/assets/sito
+            public_folder: /src/assets/sito
+            hint: Compare nella pagina "Chi sono" e in fondo alla prima pagina. Viene ritagliata verticale, quindi meglio una foto in piedi o quadrata.
           - name: prezzi
             label: Dove mostrare i prezzi
             widget: select

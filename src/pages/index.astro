@@ -5,9 +5,8 @@ import Base from '../layouts/Base.astro';
 import ProdottoCard from '../components/ProdottoCard.astro';
 import BottoneWhatsApp from '../components/BottoneWhatsApp.astro';
 import Bottone from '../components/Bottone.astro';
-import { sito } from '../lib/sito';
+import { sito, ritratto } from '../lib/sito';
 import copertina from '../assets/copertina.jpg';
-import ritratto from '../assets/alessia.jpg';
 
 const prodotti = await getCollection('prodotti');
 const inEvidenza = prodotti

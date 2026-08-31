@@ -40,6 +40,7 @@ const seSbagli = [
   ['Prodotto senza foto', 'compare un riquadro «foto in arrivo»'],
   ['Prodotto senza prezzo', 'compare «Prezzo su richiesta»'],
   ['Prodotto senza collezione', 'finisce sotto «Altri prodotti»'],
+  ['La tua foto tolta', 'al suo posto compare il riquadro grigio, il sito resta in piedi'],
   ['Collezione cancellata', 'i suoi pezzi non spariscono, si spostano lì sotto'],
 ];
 
@@ -99,6 +100,13 @@ const grassetto = (t: string) => t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong
       Apri il prodotto e spegni «Disponibile». Non lo fa sparire, ed è voluto: la scheda resta
       online e mostra «In preparazione», e il bottone diventa «Chiedi disponibilità». Così chi lo
       cercava ti scrive lo stesso e sai quanti ne rifare.
+    </p>
+
+    <h3 class="mt-6 text-lg font-medium">Cambiare la tua foto</h3>
+    <p class="mt-2 leading-relaxed text-fumo">
+      Impostazioni → Contatti e frasi del sito → «La tua foto». È quella della pagina «Chi sono», la
+      stessa che si vede in fondo alla prima pagina. Viene ritagliata verticale, quindi una foto in
+      piedi o quadrata viene meglio di una panoramica.
     </p>
 
     <h3 class="mt-6 text-lg font-medium">Cambiare una foto</h3>

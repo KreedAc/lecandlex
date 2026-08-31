@@ -1,11 +1,45 @@
+import type { ImageMetadata } from 'astro';
 import sito from '../data/sito.json';
 import datiFragranze from '../data/fragranze.json';
+import segnaposto from '../assets/segnaposto.jpg';
 
 // Il file e' un oggetto e non un array puro perche' e' cosi' che il CMS
 // serializza una lista modificabile da interfaccia.
 const fragranze = datiFragranze.fragranze;
 
 export { sito, fragranze };
+
+/**
+ * Le foto del sito che non appartengono a un prodotto — per ora solo il
+ * ritratto di "Chi sono".
+ *
+ * Il pannello salva un percorso, tipo "/src/assets/sito/alessia.jpg", non
+ * un'immagine. Questo elenco fa da ponte: trasforma quel testo
+ * nell'immagine vera, quella che Astro sa ridimensionare e convertire in
+ * WebP. Senza, la foto verrebbe servita com'e' uscita dal telefono.
+ *
+ * La cartella e' solo `sito`, non tutta `assets`: qui dentro finiscono
+ * pochi file, mentre le duecento foto dei prodotti resterebbero attaccate
+ * a ogni pagina che importa questo modulo.
+ */
+const fotoDelSito = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/sito/**/*.{jpg,jpeg,png,webp,avif}',
+  { eager: true }
+);
+
+/**
+ * Se il percorso non porta a niente — campo svuotato, file rinominato a
+ * mano, refuso — si ripiega sul segnaposto invece di fermare la
+ * pubblicazione. Una foto sbagliata si vede e si cambia dal pannello; un
+ * sito che non si aggiorna piu' no.
+ */
+function fotoDelSitoOppure(percorso: unknown, ripiego: ImageMetadata): ImageMetadata {
+  if (typeof percorso !== 'string') return ripiego;
+  return fotoDelSito[percorso.trim()]?.default ?? ripiego;
+}
+
+/** Il ritratto di "Chi sono", in home e nella pagina Chi sono. */
+export const ritratto = fotoDelSitoOppure((sito as { ritratto?: string }).ritratto, segnaposto);
 
 /**
  * Costruisce un link WhatsApp con il messaggio gia' scritto.
