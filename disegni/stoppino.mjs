@@ -1,9 +1,10 @@
 import sharp from 'sharp';
 
 // Il foglio consegnato ha sei icone: manca la 04, lo stoppino da tagliare.
-// Questa la sostituisce finche' non arriva quella vera, ricalcata sulle
-// misure delle altre: stesso anello (diametro 482 su tela 512, spesso 14),
-// stessi due colori, stessa scena "oggetto + gesto" delle altre.
+// Questa e' disegnata qui e ricalcata sulle misure delle altre: stesso
+// anello (diametro 482 su tela 512, spesso 14), stessi due colori, stessa
+// scena "oggetto + gesto". E' stata approvata: fa parte del set a tutti
+// gli effetti, non e' in attesa di essere sostituita.
 const ANELLO = '#e4d4c7';
 const SCURO = '#5c4b43';
 

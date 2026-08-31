@@ -10,8 +10,8 @@ aggiornare il sito: servono solo se cambiano i disegni.
   righe. Ha una casella in meno: manca la **04**, lo stoppino da tagliare.
 - `ritaglia.mjs` — ritaglia le sei icone dal foglio, toglie lo sfondo di
   carta e le salva in `src/assets/cura/`.
-- `stoppino.mjs` — disegna la **04** mancante, ricalcata sulle misure delle
-  altre. Va buttata via appena arriva quella vera.
+- `stoppino.mjs` — disegna la **04** che nel foglio non c'era, ricalcata
+  sulle misure delle altre. È stata approvata: fa parte del set.
 
 ## Rifarle
 
@@ -22,10 +22,10 @@ Dalla cartella del progetto:
 
 Poi `npm run build` come sempre.
 
-## Se arriva l'icona 04 vera
+## Se un giorno si vuole cambiare una singola icona
 
-Salvala come `src/assets/cura/stoppino.png`, quadrata, 192 pixel di lato,
-sfondo trasparente. Non serve altro: il nome nel codice resta quello.
+Salvala come `src/assets/cura/<nome>.png`, quadrata, 192 pixel di lato,
+sfondo trasparente. Non serve altro: i nomi nel codice restano quelli.
 
 Se invece arriva un foglio nuovo con tutte e sette, sostituisci
 `set-icone.jpg`, aggiorna in `ritaglia.mjs` i riquadri della tabella
