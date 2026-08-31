@@ -273,9 +273,11 @@ collections:
             default: appena
             options:
               - { label: 'Appena accennato', value: appena }
-              - { label: 'Più marcato', value: media }
-              - { label: 'Il massimo leggibile', value: visibile }
-            hint: Più di così la foto coprirebbe il testo. Le tre scelte sono tutte sicure, qualunque foto tu metta.
+              - { label: 'Un filo di più', value: media }
+              - { label: 'Il massimo che si legge bene', value: visibile }
+              - { label: 'Marcato — link meno nitidi', value: marcato }
+              - { label: 'Forte — anche il testo piccolo perde', value: forte }
+            hint: I primi tre sono sicuri con qualunque foto. Gli ultimi due si vedono di più ma sbiadiscono i link e le scritte piccole, quindi guarda una pagina prodotto prima di lasciarli.
           - name: prezzi
             label: Dove mostrare i prezzi
             widget: select

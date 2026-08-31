@@ -73,22 +73,37 @@ export const sfondo: ImageMetadata | null = (() => {
 /**
  * Quanto copre il velo di colore steso sopra la foto.
  *
- * I tre valori non sono scelti a occhio. Il caso peggiore non e' la foto
- * che c'e' adesso: e' una foto tutta nera, il fondo piu' scuro che possa
- * capitare sotto. Misurato il contrasto di ogni colore di testo contro
- * quel fondo, il vincolo e' l'arancione dei link — regge fino al 94% e
- * sotto scende oltre la soglia di leggibilita'.
+ * Prima cosa da sapere, perche' spiega tutto il resto: quanto si vede la
+ * foto e' limitato dalla matematica, non dal velo. Perche' il testo resti
+ * leggibile il fondo non puo' mai scendere sotto un certo grigio; da li'
+ * in su restano una quindicina di gradini di colore, ed e' tutto lo spazio
+ * in cui la foto puo' variare. Schiarire la foto e abbassare il velo non
+ * cambia niente: lo spazio e' sempre quello.
  *
- *   98%  link 5,05:1   testo 6,15:1
- *   96%  link 4,80:1   testo 5,81:1
- *   94%  link 4,59:1   testo 5,55:1   <- il minimo che si puo' tenere
- *   92%  link 4,39:1                  <- sotto soglia, fuori scelta
+ * Contrasti misurati contro il caso peggiore, una foto tutta nera:
  *
- * Per questo dal pannello si sceglie fra tre gradini e non con una
- * manopola libera: qualunque cosa scelga Alessia, il testo resta
- * leggibile. Un valore non riconosciuto ricade sul piu' coperto.
+ *   98%  testo 6,15:1   secondario 5,95:1   link 5,05:1
+ *   96%  testo 5,81:1   secondario 5,81:1   link 4,80:1
+ *   94%  testo 5,55:1   secondario 5,55:1   link 4,59:1  <- ultimo tutto a norma
+ *   88%  testo 10,9:1   secondario 4,82:1   link 3,99:1  <- link e "disponibile" sotto
+ *   84%  testo  9,9:1   secondario 4,38:1   link 3,62:1  <- anche il secondario sotto
+ *
+ * Gli ultimi due gradini esistono perche' sono stati chiesti: sotto il 94%
+ * il testo principale continua a leggersi benissimo, ma i link e la scritta
+ * "Disponibile" perdono mordente. E' una scelta di chi possiede il sito,
+ * non un errore — ma va fatta sapendo cosa costa, ed e' per questo che nel
+ * pannello quei due sono marcati.
+ *
+ * Un valore non riconosciuto ricade sul piu' coperto, che e' l'unico
+ * ripiego prudente.
  */
-const veli = { appena: 0.98, media: 0.96, visibile: 0.94 } as const;
+const veli = {
+  appena: 0.98,
+  media: 0.96,
+  visibile: 0.94,
+  marcato: 0.88,
+  forte: 0.84,
+} as const;
 
 export const veloSfondo: number =
   veli[(sito as { sfondoVelo?: keyof typeof veli }).sfondoVelo as keyof typeof veli] ?? veli.appena;
