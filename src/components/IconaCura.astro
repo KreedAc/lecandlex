@@ -1,0 +1,114 @@
+---
+/**
+ * Le iconcine delle avvertenze sulla cura della candela.
+ *
+ * Disegnate a mano invece di prendere una libreria: sono sette, pesano
+ * meno di un chilobyte in tutto, e una libreria di icone avrebbe portato
+ * un pacchetto intero e uno stile che non e' quello del sito.
+ *
+ * Tutte con lo stesso tratto e la stessa griglia da 24, altrimenti una
+ * sembra piu' grassa dell'altra. Il colore non e' deciso qui: arriva da
+ * `currentColor`, cioe' da chi le usa.
+ *
+ * Sono decorative — quello che dicono e' gia' scritto nel titolo accanto —
+ * quindi restano nascoste ai lettori vocali.
+ */
+interface Props {
+  nome: 'clessidra' | 'candela' | 'orologio' | 'forbici' | 'occhio' | 'sole' | 'zampa';
+  class?: string;
+}
+
+const { nome, class: classe = '' } = Astro.props;
+---
+
+<svg
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  {/* Un filo piu' spesso del solito: accanto ai numeri, che sono in un
+      carattere con le aste piene, un tratto sottile in quel colore
+      chiaro sembrerebbe sbiadito invece che discreto. */}
+  stroke-width="1.9"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  class:list={[classe]}
+>
+  {/* Il tempo di stagionatura: aspetta prima di accenderla. */}
+  {
+    nome === 'clessidra' && (
+      <>
+        <path d="M6.5 2.5h11M6.5 21.5h11" />
+        <path d="M8.5 2.5v3.9L12 12l3.5-5.6V2.5" />
+        <path d="M8.5 21.5v-3.9L12 12l3.5 5.6v3.9" />
+      </>
+    )
+  }
+
+  {/* Una candela accesa, ferma su un piano. */}
+  {
+    nome === 'candela' && (
+      <>
+        <path d="M12 2.6c1.4 1.5 2.1 2.6 2.1 3.6a2.1 2.1 0 0 1-4.2 0c0-1 .7-2.1 2.1-3.6Z" />
+        <rect x="8.4" y="9.4" width="7.2" height="9" rx="1.2" />
+        <path d="M3 18.4h18" />
+      </>
+    )
+  }
+
+  {/* Le ore di accensione. */}
+  {
+    nome === 'orologio' && (
+      <>
+        <circle cx="12" cy="12" r="8.6" />
+        <path d="M12 7.2V12l3.2 2" />
+      </>
+    )
+  }
+
+  {/* Tagliare lo stoppino. */}
+  {
+    nome === 'forbici' && (
+      <>
+        <circle cx="6.2" cy="6" r="2.6" />
+        <circle cx="6.2" cy="18" r="2.6" />
+        <path d="M8.5 7.4 19.5 18" />
+        <path d="M8.5 16.6 19.5 6" />
+      </>
+    )
+  }
+
+  {/* Non lasciarla mai senza sorveglianza. */}
+  {
+    nome === 'occhio' && (
+      <>
+        <path d="M2.2 12S6.1 5.8 12 5.8 21.8 12 21.8 12 17.9 18.2 12 18.2 2.2 12 2.2 12Z" />
+        <circle cx="12" cy="12" r="2.7" />
+      </>
+    )
+  }
+
+  {/* Lontano dalla luce diretta e dalle fiamme. */}
+  {
+    nome === 'sole' && (
+      <>
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2" />
+        <path d="m5.2 5.2 1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6" />
+      </>
+    )
+  }
+
+  {/* Fuori dalla portata di bambini e animali. */}
+  {
+    nome === 'zampa' && (
+      <>
+        <ellipse cx="5.9" cy="8.4" rx="1.55" ry="2" />
+        <ellipse cx="10" cy="5.9" rx="1.55" ry="2" />
+        <ellipse cx="14.3" cy="5.9" rx="1.55" ry="2" />
+        <ellipse cx="18.4" cy="8.4" rx="1.55" ry="2" />
+        <ellipse cx="12.15" cy="16.6" rx="4.9" ry="4" />
+      </>
+    )
+  }
+</svg>
