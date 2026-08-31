@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import { sito, modoPrezzi } from '../lib/sito';
+import { sito, fragranze, modoPrezzi } from '../lib/sito';
 
 // Come si comporta il sito adesso, detto con parole sue. La guida legge
 // l'impostazione vera invece di descriverne una fissa: se qualcuno cambia
@@ -215,8 +215,9 @@ const grassetto = (t: string) => t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong
       <li class="flex gap-3">
         <span class="text-fiamma" aria-hidden="true">•</span>
         <span>
-          <strong class="text-inchiostro">Le fragranze.</strong> Sono già le diciotto del catalogo.
-          Aggiornale quando cambi fornitore.
+          <strong class="text-inchiostro">Le fragranze.</strong> Sono già {fragranze.length},
+          quelle del catalogo. Aggiungile in fondo alla lista senza pensarci: sul sito compaiono in
+          ordine alfabetico da sole.
         </span>
       </li>
     </ul>

@@ -5,7 +5,18 @@ import segnaposto from '../assets/segnaposto.jpg';
 
 // Il file e' un oggetto e non un array puro perche' e' cosi' che il CMS
 // serializza una lista modificabile da interfaccia.
-const fragranze = datiFragranze.fragranze;
+//
+// L'ordine alfabetico si fa qui e non nel file: dal pannello le fragranze
+// nuove finiscono in fondo alla lista, ed e' giusto cosi' — chi le
+// aggiunge non deve stare a cercare il punto in cui infilarle. A metterle
+// in fila ci pensa il sito, a ogni pubblicazione.
+//
+// Il confronto e' quello italiano: cosi' "È" sta con "E" e le maiuscole
+// non passano davanti alle minuscole, come farebbe un ordinamento fatto
+// sui codici delle lettere.
+const fragranze = [...datiFragranze.fragranze].sort((a, b) =>
+  a.localeCompare(b, 'it', { sensitivity: 'base' })
+);
 
 export { sito, fragranze };
 
