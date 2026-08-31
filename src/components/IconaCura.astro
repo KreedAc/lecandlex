@@ -10,6 +10,10 @@
  * sembra piu' grassa dell'altra. Il colore non e' deciso qui: arriva da
  * `currentColor`, cioe' da chi le usa.
  *
+ * Il tratto e' 1,9 e non l'1,6 che verrebbe naturale: accanto ai numeri,
+ * che sono in un carattere con le aste piene, un filo sottile in quel
+ * colore chiaro sembra sbiadito invece che discreto.
+ *
  * Sono decorative — quello che dicono e' gia' scritto nel titolo accanto —
  * quindi restano nascoste ai lettori vocali.
  */
@@ -25,9 +29,6 @@ const { nome, class: classe = '' } = Astro.props;
   viewBox="0 0 24 24"
   fill="none"
   stroke="currentColor"
-  {/* Un filo piu' spesso del solito: accanto ai numeri, che sono in un
-      carattere con le aste piene, un tratto sottile in quel colore
-      chiaro sembrerebbe sbiadito invece che discreto. */}
   stroke-width="1.9"
   stroke-linecap="round"
   stroke-linejoin="round"

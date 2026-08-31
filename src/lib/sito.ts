@@ -28,6 +28,13 @@ const fotoDelSito = import.meta.glob<{ default: ImageMetadata }>(
 );
 
 /**
+ * Nota: tutte le foto della cartella finiscono nella cartella pubblicata,
+ * anche quelle non piu' usate — provata la versione "pigra" del glob, non
+ * cambia niente, gli originali vengono emessi lo stesso. Non pesano su
+ * chi visita il sito, perche' nessuna pagina le richiama; occupano solo
+ * spazio nel deposito. Per tenere pulito basta cancellare la vecchia
+ * dalla libreria del pannello quando se ne carica una nuova.
+ *
  * Se il percorso non porta a niente — campo svuotato, file rinominato a
  * mano, refuso — si ripiega sul segnaposto invece di fermare la
  * pubblicazione. Una foto sbagliata si vede e si cambia dal pannello; un
