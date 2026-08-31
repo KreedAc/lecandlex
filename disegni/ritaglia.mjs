@@ -95,16 +95,28 @@ for (const c of celle) {
     }
   }
 
-  const lato = Math.round(Math.max(w, h) * (1 + ARIA));
+  // Gli anelli del foglio non sono tutti tondi: le prime tre caselle sono
+  // cerchi (419x420), le ultime tre no — la 06 e' 469x499 e la 07 452x483,
+  // cioe' ovali del 6-7%. In pagina, uno accanto all'altro, si vede.
+  //
+  // Si rimettono in tondo schiacciando il ritaglio nel quadrato: il
+  // disegno dentro si comprime di quel 6-7%, che su una mano o un cane non
+  // si nota, mentre un anello ovale accanto a uno tondo si nota subito.
+  const interno = Math.round(LATO / (1 + ARIA));
+  const bordo = LATO - interno;
   await sharp(rgba, { raw: { width: w, height: h, channels: 4 } })
+    .resize(interno, interno, { fit: 'fill' })
     .extend({
-      top: Math.floor((lato - h) / 2), bottom: Math.ceil((lato - h) / 2),
-      left: Math.floor((lato - w) / 2), right: Math.ceil((lato - w) / 2),
+      top: Math.floor(bordo / 2), bottom: Math.ceil(bordo / 2),
+      left: Math.floor(bordo / 2), right: Math.ceil(bordo / 2),
       background: { r: 0, g: 0, b: 0, alpha: 0 },
     })
-    .resize(LATO, LATO)
     .png({ compressionLevel: 9, palette: true, colours: 24, dither: 0, effort: 10 })
     .toFile(`${dest}/${c.nome}.png`);
 
-  console.log(c.nome.padEnd(14), `${dentro.length} pezzi  ${w}x${h} @ (${x0},${y0}) -> ${LATO}px`);
+  const ovale = (((h / w) - 1) * 100).toFixed(1);
+  console.log(
+    c.nome.padEnd(14),
+    `${dentro.length} pezzi  ${w}x${h} (ovale ${ovale}%) -> ${LATO}px tondo`
+  );
 }
