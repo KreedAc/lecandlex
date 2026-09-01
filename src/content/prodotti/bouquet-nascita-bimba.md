@@ -13,7 +13,7 @@ inEvidenza: false
 estratto: ''
 varianti: []
 galleria:
-  - file: /src/assets/prodotti/IMG_0980.jpeg
+  - file: /src/assets/prodotti/IMG_7587.jpeg
     alt: ''
 personalizzabile: false
 profumabile: true
