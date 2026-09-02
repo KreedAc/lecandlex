@@ -1,7 +1,7 @@
 ---
 nome: Sole elegance
 collezione: mondo-jesmonite
-prezzo: 20
+prezzo: 24
 copertina: /src/assets/prodotti/IMG_7423.jpeg
 altCopertina: ''
 disponibile: true
