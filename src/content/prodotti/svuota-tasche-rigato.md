@@ -1,7 +1,7 @@
 ---
 nome: Sole a righe
 collezione: mondo-jesmonite
-prezzo: 15
+prezzo: 20
 copertina: /src/assets/prodotti/IMG_6424.jpeg
 altCopertina: Svuota tasche tondo a righe
 disponibile: true
