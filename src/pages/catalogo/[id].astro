@@ -9,7 +9,8 @@ import {
   sito,
   prezzo,
   prezzoSottoIlNome,
-  prezzoNellaFoto,
+  prezziNellaFoto,
+  prezziDentroLaNota,
   notaVisibile,
   prezzoMinimo,
   prezziInGriglia,
@@ -58,7 +59,8 @@ const scheda = [
 
 const minimo = prezzoMinimo(d);
 const sottoIlNome = prezzoSottoIlNome(d);
-const nellaFoto = prezzoNellaFoto(d);
+const righeDiPrezzo = prezziNellaFoto(d);
+const noteDiPrezzo = prezziDentroLaNota(d.nota);
 const nota = notaVisibile(d.nota);
 
 const datiStrutturati = {
@@ -286,8 +288,29 @@ const datiStrutturati = {
       <figure class="flex flex-col items-center gap-5">
         <div data-posto-foto class="flex justify-center"></div>
         {
-          nellaFoto && (
-            <figcaption class="text-3xl text-crema tabular-nums sm:text-4xl">{nellaFoto}</figcaption>
+          righeDiPrezzo.length > 0 && (
+            <figcaption class="max-w-full text-crema">
+              {/* Un prezzo solo resta grande, com'era. Quando i formati
+                  sono due o tre diventano un elenco: nella foto non c'e'
+                  nient'altro, quindi e' qui che il cliente deve poter
+                  leggere quanto costa la misura che gli interessa. */}
+              {righeDiPrezzo.length === 1 && !righeDiPrezzo[0].formato ? (
+                <p class="text-3xl tabular-nums sm:text-4xl">{righeDiPrezzo[0].prezzo}</p>
+              ) : (
+                <ul class="flex flex-wrap items-baseline justify-center gap-x-7 gap-y-2">
+                  {righeDiPrezzo.map((r) => (
+                    <li class="text-2xl tabular-nums sm:text-3xl">
+                      <span class="mr-2 text-base text-crema/60 sm:text-lg">{r.formato}</span>
+                      {r.prezzo}
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              {noteDiPrezzo.length > 0 && (
+                <p class="mt-4 text-sm text-crema/70 sm:text-base">{noteDiPrezzo.join(' ')}</p>
+              )}
+            </figcaption>
           )
         }
       </figure>

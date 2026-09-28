@@ -221,13 +221,62 @@ export function prezzoSottoIlNome(p: ConPrezzo): string | null {
   return null;
 }
 
-/** Il prezzo dentro la foto a schermo intero. Solo dove serve davvero. */
-export function prezzoNellaFoto(p: ConPrezzo): string | null {
-  return modoPrezzi === 'solo-scheda' ? prezzoEsposto(p) : null;
-}
-
 /** Una cifra in euro scritta in mezzo a una frase: "15 €", "€ 15", "15 euro". */
 const cifraInEuro = /(?:€\s*\d|\d[\d.,]*\s*(?:€|eur(?:o|os)?\b))/i;
+
+/**
+ * Una riga di prezzo dentro la foto: il formato, quando ce n'e' piu' d'uno,
+ * e la cifra.
+ */
+export type RigaDiPrezzo = { formato?: string; prezzo: string };
+
+type Variante = { nome: string; prezzo?: number };
+type ConVarianti = { prezzo?: number; varianti: Variante[] };
+
+/**
+ * I prezzi dentro la foto a schermo intero.
+ *
+ * Torna un elenco e non una riga sola perche' otto prodotti esistono in
+ * due o tre formati, a prezzi diversi. Prima qui compariva solo "da 3 €",
+ * il piu' basso: bastava in griglia, dove il "da" invita ad aprire la
+ * scheda, ma nella foto no — la foto e' l'unico posto dove i prezzi si
+ * vedono, e fermarsi al minimo lasciava il cliente senza sapere quanto
+ * costa la misura che gli interessa.
+ *
+ * Un formato senza prezzo scrive "su richiesta" al posto della cifra,
+ * invece di sparire: sparendo sembrerebbe che quella misura non esista.
+ */
+export function prezziNellaFoto(p: ConVarianti): RigaDiPrezzo[] {
+  if (modoPrezzi !== 'solo-scheda') return [];
+
+  if (p.varianti.length > 0) {
+    return p.varianti.map((v) => ({
+      formato: v.nome,
+      prezzo: typeof v.prezzo === 'number' ? prezzo(v.prezzo) : 'su richiesta',
+    }));
+  }
+
+  return [
+    { prezzo: typeof p.prezzo === 'number' ? prezzo(p.prezzo) : 'Prezzo su richiesta' },
+  ];
+}
+
+/**
+ * Le frasi della nota che parlano di soldi, tenute da parte per la foto.
+ *
+ * `notaVisibile` le toglie dal testo della scheda, ed e' giusto. Ma alcune
+ * dicono cose che il cliente vuole sapere — "La coppia 20 €", "Senza
+ * candela 12 €" — e senza di esse quei prodotti restavano con un prezzo
+ * solo e mezza informazione. Qui tornano, nell'unico posto dove i prezzi
+ * si mostrano.
+ */
+export function prezziDentroLaNota(nota?: string): string[] {
+  if (!nota || modoPrezzi !== 'solo-scheda') return [];
+  return nota
+    .split(/(?<=[.!?])\s+/)
+    .filter((frase) => cifraInEuro.test(frase))
+    .map((frase) => frase.trim());
+}
 
 /**
  * La nota del prodotto, senza le frasi che contengono un prezzo.
