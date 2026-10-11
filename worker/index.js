@@ -71,6 +71,12 @@ function mancaVariabile(
     'In alternativa va bene anche Bindings -> Secrets Store: il Worker',
     'legge entrambe le forme.',
     '',
+    'Se invece la vedi gia\' nel riquadro giusto ma qui non compare, e\'',
+    'stata salvata ma non pubblicata: Cloudflare tiene le modifiche alle',
+    'variabili in una versione nuova, che non diventa attiva finche\' non',
+    'si preme Deploy. Riaprila, premi Rotate, reinserisci il valore e',
+    'scegli Deploy.',
+    '',
     ...provenienza,
   ].join('\n');
 }
