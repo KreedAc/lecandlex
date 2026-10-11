@@ -121,6 +121,33 @@ separato: bastano due variabili.
 Il Worker espone solo `/auth` e `/callback`; tutto il resto viene servito come
 sito statico. Il client secret non sta mai nel repository.
 
+### In alternativa: nome utente e password
+
+Per far entrare Alessia senza un account GitHub, aggiungi nello stesso posto
+di Cloudflare (*Settings* → *Variables and Secrets*) tre segreti, tutti
+**cifrati**:
+
+- `PANNELLO_UTENTE` — il nome utente
+- `PANNELLO_PASSWORD` — almeno 12 caratteri, altrimenti il login si rifiuta
+  di partire. Non c'è un contatore dei tentativi: la difesa è la lunghezza.
+- `PANNELLO_TOKEN_GITHUB` — un token creato **dal tuo** account GitHub:
+  *Settings* → *Developer settings* → *Personal access tokens* →
+  *Fine-grained tokens* → *Generate new token*. Solo il repository
+  `KreedAc/lecandlex`, permesso *Contents: Read and write*, scadenza
+  *No expiration*.
+
+Appena c'è `PANNELLO_UTENTE`, il pulsante «Accedi con GitHub» del pannello
+apre una finestra con nome utente e password invece di GitHub. Togliendolo
+si torna al login con l'account GitHub, senza toccare il codice.
+
+Due cose da sapere:
+
+- le modifiche salvate dal pannello risultano fatte da te, perché è il tuo
+  token che GitHub vede;
+- se il token scade o lo revochi, la finestra di accesso lo dice in chiaro
+  invece di far fallire il pannello in silenzio. Per cambiare password basta
+  aggiornare `PANNELLO_PASSWORD` su Cloudflare.
+
 ## Da sistemare prima di andare online
 
 - [ ] **Verificare l'handle Instagram** in `src/data/sito.json`: nel catalogo
