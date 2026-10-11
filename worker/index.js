@@ -3,46 +3,35 @@
  *
  * Fa due cose:
  *  1. serve il sito statico prodotto da `npm run build` (tramite assets);
- *  2. gestisce il login del pannello /admin su /auth (e /callback).
+ *  2. gestisce il login del pannello /admin su /auth.
  *
  * Tenerle insieme e' una scelta: con due Worker separati servirebbe
  * configurare i domini consentiti su entrambi, e ogni cambio di dominio
  * diventerebbe una manutenzione a due mani. Cosi' pannello e login stanno
  * sulla stessa origine e non c'e' niente da tenere allineato.
  *
- * IL LOGIN HA DUE MODI, e si sceglie da solo in base a cosa e' impostato.
+ * IL LOGIN e' con nome utente e password nostri. Il pulsante del pannello
+ * apre /auth in una finestra: se nome e password sono giusti, il Worker
+ * passa al pannello una chiave GitHub che tiene lui. Chi entra non ha
+ * bisogno di un account GitHub.
  *
- * A) Nome utente e password nostri — se c'e' PANNELLO_UTENTE.
- *    Il pulsante "Accedi con GitHub" del pannello apre una finestra con
- *    nome utente e password. Se sono giusti, il Worker passa al pannello
- *    una chiave GitHub che tiene lui. Chi entra non ha bisogno di un
- *    account GitHub, e niente scade finche' non scade la chiave.
+ * La chiave serve perche' il sito vive su GitHub: ogni "Pubblica" e' una
+ * modifica scritta nel repository, e per scrivere su GitHub ci vuole un
+ * permesso di GitHub. Nome e password dicono al nostro sito chi sei; la
+ * chiave e' come il nostro sito si presenta a GitHub.
  *
- *      PANNELLO_UTENTE        cifrata   il nome utente
- *      PANNELLO_PASSWORD      cifrata   almeno 12 caratteri, o si rifiuta
- *      PANNELLO_TOKEN_GITHUB  cifrata   token "fine-grained" del proprietario
- *                                       del repository: solo questo
- *                                       repository, Contents in lettura e
- *                                       scrittura, scadenza "No expiration"
+ * Tre segreti, tutti di tipo "Secret", in
+ * Settings -> Variables and Secrets (vedi mancaVariabile):
  *
- *    Le modifiche salvate dal pannello risultano fatte dal proprietario
- *    del token: e' lui che GitHub vede.
+ *   PANNELLO_UTENTE        il nome utente
+ *   PANNELLO_PASSWORD      almeno 12 caratteri, o il login si rifiuta
+ *   PANNELLO_TOKEN_GITHUB  token "fine-grained" del proprietario del
+ *                          repository: solo questo repository, Contents in
+ *                          lettura e scrittura, scadenza "No expiration"
  *
- * B) Account GitHub — se PANNELLO_UTENTE non c'e'.
- *    Il classico login OAuth: chi entra usa il suo account GitHub, che deve
- *    essere collaboratore del repository.
- *
- *      GITHUB_CLIENT_ID       normale
- *      GITHUB_CLIENT_SECRET   cifrata
- *
- * Tutte vanno in Settings -> Variables and Secrets (vedi mancaVariabile).
+ * Le modifiche salvate dal pannello risultano fatte dal proprietario del
+ * token: e' lui che GitHub vede.
  */
-
-const AUTORIZZA = 'https://github.com/login/oauth/authorize';
-const TOKEN = 'https://github.com/login/oauth/access_token';
-
-/** Cookie di stato: lega la richiesta di login alla risposta di GitHub. */
-const COOKIE = 'lecandlex_oauth_state';
 
 /**
  * Un errore di configurazione lo legge chi sta sistemando il sito, non un
@@ -52,7 +41,7 @@ const COOKIE = 'lecandlex_oauth_state';
 function mancaVariabile(
   nome,
   env,
-  provenienza = ['I valori si prendono dalla OAuth App su GitHub:', 'Settings -> Developer settings -> OAuth Apps.']
+  provenienza = []
 ) {
   // Solo i NOMI di quello che il Worker riceve, mai i valori. Serve a
   // distinguere "l'ho messa nel posto sbagliato" da "ho sbagliato a
@@ -147,92 +136,8 @@ function paginaDiRitorno(payload, origine) {
   );
 }
 
-function cookieDiStato(valore, origine) {
-  const base = `${COOKIE}=${valore}; Path=/; HttpOnly; Secure; SameSite=Lax`;
-  // Scadenza a zero per cancellarlo dopo l'uso.
-  return valore ? `${base}; Max-Age=600` : `${base}; Max-Age=0`;
-}
-
-function leggiCookie(request, nome) {
-  const grezzo = request.headers.get('Cookie') ?? '';
-  for (const parte of grezzo.split(';')) {
-    const [chiave, ...resto] = parte.trim().split('=');
-    if (chiave === nome) return resto.join('=');
-  }
-  return null;
-}
-
-async function avviaLogin(request, env, url) {
-  const clientId = await credenziale(env.GITHUB_CLIENT_ID);
-  if (!clientId) {
-    return testo(mancaVariabile('GITHUB_CLIENT_ID', env), 500);
-  }
-
-  // Valore casuale che ritroveremo nella risposta di GitHub: se non
-  // corrisponde, la richiesta non e' partita da qui.
-  const stato = crypto.randomUUID();
-
-  const destinazione = new URL(AUTORIZZA);
-  destinazione.searchParams.set('client_id', clientId);
-  destinazione.searchParams.set('redirect_uri', `${url.origin}/callback`);
-  destinazione.searchParams.set('scope', url.searchParams.get('scope') || 'repo,user');
-  destinazione.searchParams.set('state', stato);
-
-  return new Response(null, {
-    status: 302,
-    headers: {
-      Location: destinazione.toString(),
-      'Set-Cookie': cookieDiStato(stato),
-    },
-  });
-}
-
-async function concludiLogin(request, env, url) {
-  const codice = url.searchParams.get('code');
-  const stato = url.searchParams.get('state');
-  const atteso = leggiCookie(request, COOKIE);
-
-  if (!codice) return testo('GitHub non ha restituito il codice di accesso.');
-  if (!stato || stato !== atteso) {
-    return testo('Sessione di accesso non valida. Riprova dal pannello.', 403);
-  }
-  const clientId = await credenziale(env.GITHUB_CLIENT_ID);
-  const clientSecret = await credenziale(env.GITHUB_CLIENT_SECRET);
-  if (!clientSecret) {
-    return testo(mancaVariabile('GITHUB_CLIENT_SECRET', env), 500);
-  }
-
-  const risposta = await fetch(TOKEN, {
-    method: 'POST',
-    headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      client_id: clientId,
-      client_secret: clientSecret,
-      code: codice,
-      redirect_uri: `${url.origin}/callback`,
-    }),
-  });
-
-  const esito = await risposta.json().catch(() => ({}));
-
-  const pagina = esito.access_token
-    ? paginaDiRitorno(
-        { stato: 'success', contenuto: { token: esito.access_token, provider: 'github' } },
-        url.origin
-      )
-    : paginaDiRitorno(
-        { stato: 'error', contenuto: { message: esito.error_description || 'Accesso rifiutato' } },
-        url.origin
-      );
-
-  // Il cookie ha esaurito il suo scopo: lo cancelliamo.
-  const headers = new Headers(pagina.headers);
-  headers.append('Set-Cookie', cookieDiStato(''));
-  return new Response(pagina.body, { status: pagina.status, headers });
-}
-
 /* ------------------------------------------------------------------------
- * Login con nome utente e password (modo A)
+ * Login con nome utente e password
  * --------------------------------------------------------------------- */
 
 /** Il repository su cui la chiave deve funzionare: lo stesso di admin/config.yml. */
@@ -440,23 +345,14 @@ async function accessoConPassword(request, env, url) {
 
 /**
  * Le richieste che corrispondono a un file del sito vengono servite prima
- * di arrivare qui. Il Worker riceve solo il resto: le due rotte del login,
- * e gli indirizzi che non esistono.
+ * di arrivare qui. Il Worker riceve solo il resto: la rotta del login e
+ * gli indirizzi che non esistono.
  */
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Se c'e' un nome utente impostato, il login e' quello nostro con la
-    // password; altrimenti resta quello con l'account GitHub. Cosi' il
-    // passaggio dall'uno all'altro e' solo questione di variabili: finche'
-    // non sono impostate, tutto funziona come prima.
-    if (url.pathname === '/auth') {
-      return env.PANNELLO_UTENTE
-        ? accessoConPassword(request, env, url)
-        : avviaLogin(request, env, url);
-    }
-    if (url.pathname === '/callback') return concludiLogin(request, env, url);
+    if (url.pathname === '/auth') return accessoConPassword(request, env, url);
 
     // Nessun file e nessuna rotta: mostriamo la pagina 404 del sito invece
     // di quella grigia di Cloudflare.

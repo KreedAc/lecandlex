@@ -10,5 +10,58 @@
     <!-- Sveltia CMS: stesso formato di configurazione di Decap, ma
          l'interfaccia funziona bene anche da telefono. -->
     <script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js" type="module"></script>
+
+    <!-- Ritocca la schermata di accesso, che Sveltia non lascia configurare.
+
+         Il pulsante principale dice "Accedi con GitHub", ma apre il nostro
+         login con nome utente e password: si chiama solo "Accedi". Quello
+         del token si nasconde, perche' con nome e password non serve e
+         sarebbe solo un modo per sbagliare strada.
+
+         Riconosce i pulsanti dalla scritta. Se un giorno Sveltia la
+         cambiasse, questo script smette semplicemente di trovarli: torna
+         la schermata originale, e non si rompe niente. -->
+    <script>
+      (function () {
+        var GITHUB = /^(Accedi con GitHub|Sign In with GitHub)$/i;
+        var TOKEN = /^(Accedi con Token di Accesso|Sign In Using Access Token)$/i;
+
+        // Sveltia circonda i nomi propri di caratteri invisibili, quelli che
+        // tengono a posto il verso del testo: "con ⁨GitHub⁩". A
+        // occhio non si vedono, ma un confronto sulla scritta fallisce.
+        // Si tolgono prima di confrontare.
+        var INVISIBILI = /[‎‏⁦-⁩]/g;
+
+        function ritocca() {
+          var pulsanti = document.querySelectorAll('button');
+          for (var i = 0; i < pulsanti.length; i++) {
+            var b = pulsanti[i];
+            var scritta = (b.textContent || '').replace(INVISIBILI, '').trim();
+            if (GITHUB.test(scritta)) {
+              // Si cambia solo il testo, non il pulsante: le icone e gli
+              // agganci di Sveltia restano dove sono. La scritta potrebbe
+              // essere spezzata in piu' pezzi: il primo diventa "Accedi",
+              // gli altri si svuotano.
+              var giro = document.createTreeWalker(b, NodeFilter.SHOW_TEXT);
+              var nodo, primo = true;
+              while ((nodo = giro.nextNode())) {
+                if (!nodo.nodeValue.trim()) continue;
+                nodo.nodeValue = primo ? 'Accedi' : '';
+                primo = false;
+              }
+            } else if (TOKEN.test(scritta)) {
+              b.style.display = 'none';
+            }
+          }
+        }
+
+        new MutationObserver(ritocca).observe(document.documentElement, {
+          childList: true,
+          subtree: true,
+          characterData: true,
+        });
+        ritocca();
+      })();
+    </script>
   </body>
 </html>

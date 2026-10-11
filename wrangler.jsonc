@@ -11,6 +11,15 @@
   "main": "worker/index.js",
   "compatibility_date": "2025-11-01",
 
+  // Tiene le variabili impostate a mano nel pannello di Cloudflare.
+  //
+  // Senza, ogni deploy da git le sostituisce con quelle scritte qui — cioe'
+  // con nessuna — e ogni "Pubblica" del pannello e' un deploy da git. Le
+  // credenziali del login sparirebbero alla prima modifica di Alessia, se
+  // per sbaglio fossero salvate come testo invece che come "Secret". I
+  // "Secret" restano comunque; questa riga copre anche l'errore.
+  "keep_vars": true,
+
   "assets": {
     // La cartella che produce `npm run build`. Senza questa riga Wrangler
     // non sa cosa pubblicare, ed e' il motivo per cui le immagini non

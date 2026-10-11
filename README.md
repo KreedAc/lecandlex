@@ -88,7 +88,6 @@ si vuole, senza rifare niente. Al momento del passaggio:
 1. Cloudflare → il Worker → *Domains & Routes* → aggiungi il dominio
 2. Cambia la variabile `SITE_URL` con il nuovo indirizzo e rilancia il deploy
 3. Aggiorna `base_url` e `site_url` in `public/admin/config.yml`
-4. Aggiorna il *callback URL* della OAuth App su GitHub con il nuovo dominio
 
 Il dominio vive in `SITE_URL`: sitemap, canonical, anteprime social e
 `robots.txt` lo seguono da soli. Le uniche righe da cambiare a mano sono
@@ -97,56 +96,54 @@ browser e non passa dalla build.
 
 ## Attivare il CMS
 
-Il pannello sta su `/admin`. Il login GitHub è gestito dallo stesso Worker che
-serve il sito (`worker/index.js`), quindi non serve distribuire nulla di
-separato: bastano due variabili.
+Il pannello sta su `/admin`. Si entra con **nome utente e password**, gestiti
+dallo stesso Worker che serve il sito (`worker/index.js`): non serve
+distribuire nulla di separato, e chi entra non ha bisogno di un account
+GitHub.
 
-1. **GitHub OAuth App** — su GitHub, *Settings* → *Developer settings* →
-   *OAuth Apps* → *New OAuth App*.
-   - *Homepage URL*: l'indirizzo del sito
-   - *Authorization callback URL*: l'indirizzo del sito seguito da `/callback`
-   - Annota **Client ID** e **Client Secret**
+1. **Chiave GitHub** — dal tuo account (il proprietario del repository):
+   *Settings* → *Developer settings* → *Personal access tokens* →
+   *Fine-grained tokens* → *Generate new token*.
+   - *Repository access*: solo `KreedAc/lecandlex`
+   - *Permissions*: *Contents: Read and write*
+   - *Expiration*: *No expiration*
 
-2. **Variabili** — su Cloudflare, nelle impostazioni del Worker, aggiungi:
-   - `GITHUB_CLIENT_ID` — variabile normale
-   - `GITHUB_CLIENT_SECRET` — **cifrata** (spunta *Encrypt*)
+   Serve perché il sito vive su GitHub: ogni «Pubblica» del pannello è una
+   modifica scritta nel repository. Nome e password dicono al sito chi sei;
+   la chiave è come il sito si presenta a GitHub. Chi entra non la vede mai.
+
+2. **Segreti** — su Cloudflare, nel Worker: *Settings* → scorri **sotto** il
+   riquadro «Build» → *Variables and Secrets*. Tre voci, tutte di tipo
+   **Secret**:
+   - `PANNELLO_UTENTE` — il nome utente
+   - `PANNELLO_PASSWORD` — almeno 12 caratteri, altrimenti il login si
+     rifiuta di partire. Non c'è un contatore dei tentativi: la difesa è la
+     lunghezza.
+   - `PANNELLO_TOKEN_GITHUB` — la chiave del punto 1
+
+   Attenzione a non metterli nel riquadro «Build»: lì servono solo a
+   costruire il sito e il Worker non li vede. Se succede, la finestra di
+   accesso lo dice ed elenca i nomi che il Worker vede davvero.
 
 3. **Collega** — in `public/admin/config.yml` verifica che `base_url` sia
    l'indirizzo del sito e che `repo` e `branch` siano corretti.
 
-4. **Accesso** — l'account GitHub di Alessia va aggiunto come collaboratore del
-   repository. Da quel momento può modificare tutto da `/admin`, anche dal
-   telefono: ogni salvataggio è un commit, e il sito si ricostruisce da solo.
+Da quel momento si modifica tutto da `/admin`, anche dal telefono: ogni
+salvataggio è un commit, e il sito si ricostruisce da solo.
 
-Il Worker espone solo `/auth` e `/callback`; tutto il resto viene servito come
-sito statico. Il client secret non sta mai nel repository.
+Da sapere:
 
-### In alternativa: nome utente e password
+- le modifiche salvate dal pannello risultano fatte dal proprietario della
+  chiave, perché è lui che GitHub vede;
+- se la chiave scade o viene revocata, la finestra di accesso lo dice in
+  chiaro invece di far fallire il pannello in silenzio;
+- per cambiare password basta aggiornare `PANNELLO_PASSWORD` su Cloudflare;
+- il pulsante del pannello si chiamerebbe «Accedi con GitHub»: lo rinomina
+  in «Accedi» un piccolo script in `public/admin/index.html`, che nasconde
+  anche l'accesso con token.
 
-Per far entrare Alessia senza un account GitHub, aggiungi nello stesso posto
-di Cloudflare (*Settings* → *Variables and Secrets*) tre segreti, tutti
-**cifrati**:
-
-- `PANNELLO_UTENTE` — il nome utente
-- `PANNELLO_PASSWORD` — almeno 12 caratteri, altrimenti il login si rifiuta
-  di partire. Non c'è un contatore dei tentativi: la difesa è la lunghezza.
-- `PANNELLO_TOKEN_GITHUB` — un token creato **dal tuo** account GitHub:
-  *Settings* → *Developer settings* → *Personal access tokens* →
-  *Fine-grained tokens* → *Generate new token*. Solo il repository
-  `KreedAc/lecandlex`, permesso *Contents: Read and write*, scadenza
-  *No expiration*.
-
-Appena c'è `PANNELLO_UTENTE`, il pulsante «Accedi con GitHub» del pannello
-apre una finestra con nome utente e password invece di GitHub. Togliendolo
-si torna al login con l'account GitHub, senza toccare il codice.
-
-Due cose da sapere:
-
-- le modifiche salvate dal pannello risultano fatte da te, perché è il tuo
-  token che GitHub vede;
-- se il token scade o lo revochi, la finestra di accesso lo dice in chiaro
-  invece di far fallire il pannello in silenzio. Per cambiare password basta
-  aggiornare `PANNELLO_PASSWORD` su Cloudflare.
+Il Worker espone solo `/auth`; tutto il resto viene servito come sito
+statico. Nessuna credenziale sta nel repository.
 
 ## Da sistemare prima di andare online
 

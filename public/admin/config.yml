@@ -12,15 +12,11 @@ backend:
   # costruisce il sito. Se non coincidono, le modifiche fatte dal pannello
   # vengono salvate su un branch che nessuno pubblica: sembrano sparite.
   branch: main
-  # Il login e' gestito dallo stesso Worker che serve il sito (worker/index.js),
-  # quindi qui va l'indirizzo del sito stesso. Se cambi dominio, cambia anche
-  # questa riga: e' l'unico posto del pannello che non lo segue da solo.
-  #
-  # E cambia insieme a lei la "Authorization callback URL" dell'app OAuth su
-  # GitHub (Settings > Developer settings > OAuth Apps): deve essere questo
-  # stesso indirizzo seguito da /callback. Il Worker costruisce il ritorno
-  # dal dominio da cui arriva la richiesta, e GitHub rifiuta un ritorno verso
-  # un dominio diverso da quello registrato.
+  # Il login (nome utente e password) e' gestito dallo stesso Worker che
+  # serve il sito (worker/index.js): il pulsante del pannello apre
+  # base_url + /auth. Qui va quindi l'indirizzo del sito stesso. Se cambi
+  # dominio, cambia anche questa riga: e' l'unico posto del pannello che
+  # non lo segue da solo.
   base_url: https://lecandlex.com
 
 locale: it
