@@ -11,7 +11,7 @@ import tailwindcss from '@tailwindcss/vite';
 // Pages. Quando si passa dal dominio provvisorio .pages.dev a quello
 // definitivo basta cambiare quella variabile e rilanciare il deploy —
 // nessun file da toccare.
-const site = process.env.SITE_URL ?? 'https://lecandlex.pages.dev';
+const site = process.env.SITE_URL ?? 'https://lecandlex.com';
 
 export default defineConfig({
   site,

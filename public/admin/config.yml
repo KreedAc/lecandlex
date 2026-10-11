@@ -15,14 +15,20 @@ backend:
   # Il login e' gestito dallo stesso Worker che serve il sito (worker/index.js),
   # quindi qui va l'indirizzo del sito stesso. Se cambi dominio, cambia anche
   # questa riga: e' l'unico posto del pannello che non lo segue da solo.
-  base_url: https://lecandlex.giovanniavignone.workers.dev
+  #
+  # E cambia insieme a lei la "Authorization callback URL" dell'app OAuth su
+  # GitHub (Settings > Developer settings > OAuth Apps): deve essere questo
+  # stesso indirizzo seguito da /callback. Il Worker costruisce il ritorno
+  # dal dominio da cui arriva la richiesta, e GitHub rifiuta un ritorno verso
+  # un dominio diverso da quello registrato.
+  base_url: https://lecandlex.com
 
 locale: it
 publish_mode: simple
 # Serve solo al link "vedi il sito" dentro il pannello. Se cambi dominio e
 # ti dimentichi di aggiornarlo qui, quel link porta al vecchio indirizzo:
 # nient'altro si rompe.
-site_url: https://lecandlex.pages.dev
+site_url: https://lecandlex.com
 
 # Le foto stanno in src/assets/ e non in public/, cosi' Astro le ottimizza
 # in WebP/AVIF responsive invece di servire gli originali dal telefono.
