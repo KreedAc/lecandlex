@@ -105,34 +105,79 @@ function testo(messaggio, stato = 400) {
 }
 
 /**
+ * Gli indirizzi da cui il pannello puo' essere aperto.
+ *
+ * La finestra del login si apre sempre su base_url (lecandlex.com), ma il
+ * pannello che l'ha aperta puo' stare su un altro dei nostri indirizzi —
+ * un preferito salvato quando il sito era ancora su .workers.dev, per
+ * esempio. La chiave va consegnata al pannello che l'ha chiesta, e solo se
+ * sta su uno di questi: mai a un sito qualunque.
+ */
+const ORIGINI_DEL_SITO = [
+  'https://lecandlex.com',
+  'https://www.lecandlex.com',
+  'https://lecandlex.giovanniavignone.workers.dev',
+];
+
+/**
  * Pagina di chiusura del login.
  *
  * Il pannello apre /auth in una finestra separata e resta in ascolto: questa
- * pagina gli passa il token e si chiude. E' il protocollo che si aspettano
- * Sveltia CMS e Decap CMS.
+ * pagina gli passa la chiave e si chiude. E' il protocollo che si aspettano
+ * Sveltia CMS e Decap CMS, in due tempi:
+ *
+ *   1. la finestra annuncia "authorizing:github";
+ *   2. il pannello risponde, e da quella risposta si sa da quale indirizzo
+ *      parla davvero;
+ *   3. solo allora la chiave parte, verso quell'indirizzo e nessun altro.
+ *
+ * L'annuncio del punto 1 non contiene niente di riservato, quindi si manda a
+ * tutti i nostri indirizzi: il browser lo recapita solo a quello giusto.
  */
 function paginaDiRitorno(payload, origine) {
   const dati = JSON.stringify(payload).replace(/</g, '\\u003c');
+  const consentite = JSON.stringify([...new Set([origine, ...ORIGINI_DEL_SITO])]);
 
   return new Response(
     `<!doctype html>
 <html lang="it">
-  <head><meta charset="utf-8" /><title>Accesso in corso…</title></head>
-  <body style="font-family: system-ui, sans-serif; padding: 2rem; color: #33241b">
-    <p>Accesso completato. Puoi chiudere questa finestra.</p>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Accesso in corso…</title>
+  </head>
+  <body style="font: 16px/1.5 system-ui, sans-serif; padding: 2rem; color: #33241b; background: #fffaf6">
+    <p id="stato">Accesso in corso…</p>
     <script>
       (function () {
         var dati = ${dati};
+        var consentite = ${consentite};
         var messaggio = 'authorization:github:' + dati.stato + ':' + JSON.stringify(dati.contenuto);
+        var pannello = window.opener;
+        var scritta = document.getElementById('stato');
 
-        function rispondi(evento) {
-          window.removeEventListener('message', rispondi, false);
-          window.opener.postMessage(messaggio, ${JSON.stringify(origine)});
+        if (!pannello) {
+          scritta.textContent =
+            'Questa finestra ha perso il collegamento con il pannello. Chiudila, torna alla pagina del pannello e premi di nuovo Accedi.';
+          return;
         }
 
-        if (window.opener) {
-          window.addEventListener('message', rispondi, false);
-          window.opener.postMessage('authorizing:github', ${JSON.stringify(origine)});
+        function rispondi(evento) {
+          if (evento.source !== pannello) return;
+          if (consentite.indexOf(evento.origin) === -1) return;
+          window.removeEventListener('message', rispondi, false);
+          pannello.postMessage(messaggio, evento.origin);
+
+          scritta.textContent = 'Fatto. Puoi tornare al pannello.';
+          // Un attimo di respiro perche' il messaggio parta, poi la
+          // finestra si chiude da sola. Se il browser non lo permette
+          // resta la scritta qui sopra.
+          setTimeout(function () { window.close(); }, 400);
+        }
+
+        window.addEventListener('message', rispondi, false);
+        for (var i = 0; i < consentite.length; i++) {
+          try { pannello.postMessage('authorizing:github', consentite[i]); } catch (e) {}
         }
       })();
     </script>

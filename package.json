@@ -8,7 +8,8 @@
     "prebuild": "node script/controlla-pannello.mjs",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "prova:login": "node script/prova-login.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
