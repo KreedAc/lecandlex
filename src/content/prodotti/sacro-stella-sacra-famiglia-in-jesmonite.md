@@ -1,7 +1,7 @@
 ---
 nome: Stella Sacra Famiglia
 collezione: xmas
-prezzo: 10
+prezzo: 12
 copertina: /src/assets/prodotti/product-121.jpg
 altCopertina: ''
 disponibile: true
