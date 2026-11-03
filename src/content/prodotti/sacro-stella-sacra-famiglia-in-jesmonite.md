@@ -1,6 +1,6 @@
 ---
 nome: Stella Sacra Famiglia
-collezione: mondo-jesmonite
+collezione: xmas
 prezzo: 10
 copertina: /src/assets/prodotti/product-121.jpg
 altCopertina: ''
