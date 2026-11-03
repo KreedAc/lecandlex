@@ -1,7 +1,7 @@
 ---
 nome: Cheers
 collezione: xmas
-prezzo: 10
+prezzo: 9.5
 copertina: /src/assets/prodotti/product-095.jpg
 altCopertina: ''
 disponibile: true
