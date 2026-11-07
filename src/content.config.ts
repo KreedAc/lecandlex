@@ -111,6 +111,11 @@ const prodotti = defineCollection({
       profumabile: interruttore(true),
 
       disponibile: interruttore(true),
+      // Diverso da "disponibile": quello lascia il prodotto in vetrina con
+      // la scritta "In preparazione", questo lo toglie dal sito del tutto.
+      // Spento se manca, cosi' i prodotti salvati prima che esistesse
+      // restano visibili. Lo legge src/lib/prodotti.ts.
+      nascosto: interruttore(false),
       inEvidenza: interruttore(false),
       ordine: numeroCon(100),
       nota: testo,

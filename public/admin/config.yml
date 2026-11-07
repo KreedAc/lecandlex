@@ -50,6 +50,10 @@ collections:
     sortable_fields: [ordine, nome, prezzo]
     view_groups:
       - { label: Per collezione, field: collezione }
+    # Per ritrovare in un tocco i prodotti nascosti quando si vuole
+    # rimetterli: su oltre duecento prodotti, cercarli a occhio non si fa.
+    view_filters:
+      - { label: Nascosti dal sito, field: nascosto, pattern: true }
     fields:
       - name: nome
         label: Nome
@@ -91,6 +95,13 @@ collections:
         widget: boolean
         default: true
         hint: Spegnilo quando finisci un lotto. La scheda resta online e mostra "In preparazione", così chi lo cerca ti scrive lo stesso.
+
+      - name: nascosto
+        label: Nascondi dal sito
+        widget: boolean
+        default: false
+        required: false
+        hint: Acceso, il prodotto sparisce dal sito ma resta salvato qui, con foto e prezzi. Spegnilo e torna com'era. Per ritrovare i nascosti usa il filtro "Nascosti dal sito" nell'elenco dei prodotti.
 
       - name: pesoGrammi
         label: Peso in grammi

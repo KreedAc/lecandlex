@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "node script/controlla-pannello.mjs",
+    "prebuild": "node script/controlla-pannello.mjs && node script/controlla-prodotti.mjs",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",

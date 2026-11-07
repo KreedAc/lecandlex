@@ -1,6 +1,6 @@
 ---
+import { prodottiInVetrina } from '../lib/prodotti';
 import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import ProdottoCard from '../components/ProdottoCard.astro';
 import BottoneWhatsApp from '../components/BottoneWhatsApp.astro';
@@ -8,16 +8,19 @@ import Bottone from '../components/Bottone.astro';
 import { sito, ritratto } from '../lib/sito';
 import copertina from '../assets/copertina.jpg';
 
-const prodotti = await getCollection('prodotti');
+const prodotti = await prodottiInVetrina();
 const inEvidenza = prodotti
   .filter((p) => p.data.inEvidenza)
   .sort((a, b) => a.data.ordine - b.data.ordine)
   .slice(0, 4);
 
-// La home non deve restare vuota per una dimenticanza nel CMS.
-const vetrina = inEvidenza.length
-  ? inEvidenza
-  : prodotti.sort((a, b) => a.data.ordine - b.data.ordine).slice(0, 4);
+// La fila in prima pagina ha quattro posti, e restano sempre pieni: prima i
+// pezzi messi in evidenza, poi — se sono meno di quattro — gli altri,
+// nell'ordine del catalogo. Succede quando un pezzo in evidenza viene
+// nascosto dal pannello, o quando se ne segnano solo tre: senza questo
+// la fila resterebbe con un buco, o vuota del tutto.
+const ordinati = [...prodotti].sort((a, b) => a.data.ordine - b.data.ordine);
+const vetrina = [...inEvidenza, ...ordinati.filter((p) => !inEvidenza.includes(p))].slice(0, 4);
 ---
 
 <Base titolo={sito.nome}>

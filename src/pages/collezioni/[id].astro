@@ -1,4 +1,5 @@
 ---
+import { prodottiInVetrina } from '../../lib/prodotti';
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
 import NavCollezioni from '../../components/NavCollezioni.astro';
@@ -7,7 +8,7 @@ import BottoneWhatsApp from '../../components/BottoneWhatsApp.astro';
 
 export async function getStaticPaths() {
   const collezioni = await getCollection('collezioni');
-  const prodotti = await getCollection('prodotti');
+  const prodotti = await prodottiInVetrina();
 
   return collezioni
     .filter((c) => prodotti.some((p) => p.data.collezione?.id === c.id))
@@ -19,7 +20,7 @@ export async function getStaticPaths() {
 
 const { collezione } = Astro.props;
 
-const prodotti = (await getCollection('prodotti'))
+const prodotti = (await prodottiInVetrina())
   .filter((p) => p.data.collezione?.id === collezione.id)
   .sort((a, b) => a.data.ordine - b.data.ordine);
 
